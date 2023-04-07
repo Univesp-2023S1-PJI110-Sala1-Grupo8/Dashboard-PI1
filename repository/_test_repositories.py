@@ -149,6 +149,7 @@ def test_repositories():
         for user in allowed_users:
             print(user)
 
+    db.disconnect()
 
 if __name__ == '__main__':
     test_repositories()

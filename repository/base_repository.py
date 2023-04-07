@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector import errorcode
-from _database import Database
+from repository._database import Database
 
 
 class BaseRepository():

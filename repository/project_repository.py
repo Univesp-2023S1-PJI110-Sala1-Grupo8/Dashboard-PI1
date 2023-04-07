@@ -1,9 +1,9 @@
 import mysql.connector
-from base_repository import BaseRepository
-from user_repository import UserRepository
 from model.project_model import Project
 from model.feature_model import Feature
 from model.category_model import Category
+from repository.base_repository import BaseRepository
+from repository.user_repository import UserRepository
 
 
 class ProjectRepository(BaseRepository):
@@ -11,14 +11,13 @@ class ProjectRepository(BaseRepository):
     Project repository class responsible for maintain persisted project entities
     along with features and categories.
     """
-    PROJECT_REPO_SQL_DQL_GET_ALL_PROJECTS     = "SELECT id, nome, nome_curto, descricao, percentual, status, usuario_id FROM projeto WHERE usuario_id = %s"
-    PROJECT_REPO_SQL_DQL_GET_PROJECT_BY_ID    = "SELECT id, nome, nome_curto, descricao, percentual, status, usuario_id FROM projeto WHERE id = %s"
-    PROJECT_REPO_SQL_DQL_GET_PROJECT_BY_SNAME = "SELECT id, nome, nome_curto, descricao, percentual, status, usuario_id FROM projeto WHERE nome_curto = %s"
-    PROJECT_REPO_SQL_DML_INSERT_PROJECT       = "INSERT INTO projeto (nome, nome_curto, descricao, percentual, status, usuario_id) VALUES (%s, %s, %s, %s, %s, %s)"
-    PROJECT_REPO_SQL_DML_UPDATE_PROJECT       = "UPDATE projeto SET nome = %s, nome_curto = %s, descricao = %s, percentual = %s, status = %s WHERE id = %s"
-    PROJECT_REPO_SQL_DML_DELETE_PROJECT       = "DELETE FROM projeto WHERE id = %s"
-
-    user_repository = None
+    PROJECT_REPO_SQL_DQL_GET_ALL_PROJECTS        = "SELECT id, nome, nome_curto, descricao, percentual, status, usuario_id FROM projeto WHERE usuario_id = %s"
+    PROJECT_REPO_SQL_DQL_GET_PROJECT_BY_ID       = "SELECT id, nome, nome_curto, descricao, percentual, status, usuario_id FROM projeto WHERE id = %s"
+    PROJECT_REPO_SQL_DQL_GET_PROJECT_BY_SNAME    = "SELECT id, nome, nome_curto, descricao, percentual, status, usuario_id FROM projeto WHERE nome_curto = %s"
+    PROJECT_REPO_SQL_DML_INSERT_PROJECT          = "INSERT INTO projeto (nome, nome_curto, descricao, percentual, status, usuario_id) VALUES (%s, %s, %s, %s, %s, %s)"
+    PROJECT_REPO_SQL_DML_UPDATE_PROJECT          = "UPDATE projeto SET nome = %s, nome_curto = %s, descricao = %s, percentual = %s, status = %s WHERE id = %s"
+    PROJECT_REPO_SQL_DML_DELETE_PROJECT          = "DELETE FROM projeto WHERE id = %s"
+    PROJECT_REPO_SQL_DML_DELETE_BY_SNAME_PROJECT = "DELETE FROM projeto WHERE nome_curto = %s"
 
     def __init__(self, database):
         super().__init__(database)
@@ -60,6 +59,17 @@ class ProjectRepository(BaseRepository):
         try:
             cursor = self.db.conn.cursor()
             cursor.execute(self.PROJECT_REPO_SQL_DML_DELETE_PROJECT, (project_id,))
+            cursor.close()
+            self.db.conn.commit()
+            return True
+        except mysql.connector.Error as err:
+            self.report_error(err)
+        return False
+
+    def delete_project_by_shortname(self, project_shortname):
+        try:
+            cursor = self.db.conn.cursor()
+            cursor.execute(self.PROJECT_REPO_SQL_DML_DELETE_PROJECT_BY_SNAME, (project_shortname,))
             cursor.close()
             self.db.conn.commit()
             return True

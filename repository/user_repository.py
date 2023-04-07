@@ -1,5 +1,5 @@
 import mysql.connector
-from base_repository import BaseRepository
+from repository.base_repository import BaseRepository
 from model.user_model import User
 from model.profile_model import Profile
 

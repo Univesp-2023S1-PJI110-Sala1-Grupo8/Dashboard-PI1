@@ -9,12 +9,9 @@ class Category(Entity):
         id      The category unique id.
         name    The category name.
     """
-    id = 0
-    name = ""
-    features = []
 
     def __init__(self, id=0, name=""):
-        """Constructor with name."""
+        super().__init__()
         self.id = id
         self.name = name
         self.features = []

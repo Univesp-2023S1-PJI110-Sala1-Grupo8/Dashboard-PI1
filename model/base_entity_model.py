@@ -5,4 +5,5 @@ class Entity:
     Attributes:
         id  The unique id to identify each entity object
     """
-    id = 0
+    def __init__(self):
+        self.id = 0

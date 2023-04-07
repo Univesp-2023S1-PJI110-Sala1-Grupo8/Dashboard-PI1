@@ -5,16 +5,10 @@ class Feature(Entity):
     """
     A class to represent the feature entity.
     """
-    name = ""
-    short_name = ""
-    description = ""
-    percent_done = 0.0
-    estimated_end_date = None
-    status = FeatureStatus.NOT_STARTED
 
     def __init__(self, id=0, name="", short_name="", description="",
                  percent_done=0, estimated_end_date=None, status=FeatureStatus.NOT_STARTED):
-        """Constructor with arguments."""
+        super().__init__()
         self.id = id
         self.name = name
         self.short_name = short_name

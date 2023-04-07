@@ -1,7 +1,7 @@
 import mysql.connector
 from model.feature_model import Feature
 from model.feature_model import Feature
-from base_repository import BaseRepository
+from repository.base_repository import BaseRepository
 
 
 class FeatureRepository(BaseRepository):
@@ -92,13 +92,13 @@ class FeatureRepository(BaseRepository):
             self.report_error(err)
         return None
 
-    def get_all_features_in_project_category(self, category_id):
+    def get_all_features_in_category(self, category_id):
         try:
             cursor = self.db.conn.cursor()
             cursor.execute(self.FEATURE_REPO_SQL_DQL_GET_ALL_FEATURES, (category_id,))
             resultList = []
             for (feature_id, feature_name, feature_shortname, feature_descr, feature_enddate,
-                 feature_percentdone, feature_status) in cursor:
+                 feature_percentdone, feature_status, category_id, project_id) in cursor:
                 feature = Feature(id=feature_id, name=feature_name, short_name=feature_shortname,
                                   description=feature_descr, percent_done=feature_percentdone,
                                   estimated_end_date=feature_enddate, status=feature_status)

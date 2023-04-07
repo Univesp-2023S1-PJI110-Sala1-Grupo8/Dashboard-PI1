@@ -6,17 +6,9 @@ class Project(Entity):
     """
     A class to represent the project entity.
     """
-    name = ""
-    short_name = ""
-    description = ""
-    percent_done = 0.0
-    status = ProjectStatus.ACTIVE
-    owner = None
-    allowed_users = []
-    feature_categories = []
 
     def __init__(self, id=0, name="", short_name="", description="", percent_done=0.0, status=ProjectStatus.ACTIVE, owner=None):
-        """Constructor with arguments."""
+        super().__init__()
         self.id = id
         self.name = name
         self.short_name = short_name

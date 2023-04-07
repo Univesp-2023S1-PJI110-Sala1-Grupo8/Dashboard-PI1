@@ -1,6 +1,6 @@
 import mysql.connector
 from model.category_model import Category
-from base_repository import BaseRepository
+from repository.base_repository import BaseRepository
 
 
 class CategoryRepository(BaseRepository):

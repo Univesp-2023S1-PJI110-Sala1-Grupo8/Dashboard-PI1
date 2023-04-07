@@ -9,10 +9,9 @@ class Profile(Entity):
         id      The profile unique id.
         name    The profile name.
     """
-    name = ""
 
     def __init__(self, id=0, name=""):
-        """Constructor with name."""
+        super().__init__()
         self.id = id
         self.name = name
 

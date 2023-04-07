@@ -6,14 +6,9 @@ class User(Entity):
     """
     A class to represent the user entity.
     """
-    first_name = ""
-    last_name = ""
-    email = ""
-    password = ""
-    profile = Profile("")
 
     def __init__(self, id=0, first_name="", last_name="", email="", password="", profile=None):
-        """Constructor with name."""
+        super().__init__()
         self.id = id
         self.first_name = first_name
         self.last_name = last_name
