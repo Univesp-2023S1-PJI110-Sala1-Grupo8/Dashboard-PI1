@@ -30,13 +30,13 @@ class Category(Entity):
         """Profile representation."""
         return "Category(id={0},name='{1},features:{2})".format(self.id, self.name, len(self.features))
 
-    def findFeature(self, feature):
+    def find_feature(self, feature):
         return next((f for f in self.features if f.id == f.id and f.name == feature.name), None)
 
-    def addFeature(self, feature):
-        if feature is not None and self.findFeature(feature) is None:
+    def add_feature(self, feature):
+        if feature is not None and self.find_feature(feature) is None:
             self.features.append(feature)
 
-    def removeFeature(self, feature):
+    def remove_feature(self, feature):
         if feature is not None:
             self.features.remove(feature)

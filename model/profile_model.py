@@ -1,4 +1,4 @@
-from base_entity_model import Entity
+from model.base_entity_model import Entity
 
 
 class Profile(Entity):
@@ -11,8 +11,9 @@ class Profile(Entity):
     """
     name = ""
 
-    def __init__(self, name):
+    def __init__(self, id=0, name=""):
         """Constructor with name."""
+        self.id = id
         self.name = name
 
     def __eq__(self, other):

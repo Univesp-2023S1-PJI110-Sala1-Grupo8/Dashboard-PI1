@@ -1,24 +1,23 @@
+from user_model import User
 from project_model import Project
 from profile_model import Profile
 from feature_model import Feature
 from category_model import Category
-
-from user_model import User
 
 
 def test_model():
     profile = Profile("admin")
     print(profile)
 
-    blankUser = User()
-    print(blankUser)
-    someUser = User(first_name="João", last_name="da Silva", email="joaodasilva@gmail.com", profile=Profile("admin"))
-    print(someUser)
-    anotherUser = User(first_name="Maria", last_name="dos Santos", email="mariadossantos@gmail.com", profile=Profile("convidado"))
-    print(anotherUser)
+    blank_user = User()
+    print(blank_user)
+    some_user = User(first_name="João", last_name="da Silva", email="joaodasilva@gmail.com", profile=Profile("admin"))
+    print(some_user)
+    another_user = User(first_name="Maria", last_name="dos Santos", email="mariadossantos@gmail.com", profile=Profile("convidado"))
+    print(another_user)
 
-    emptyProject = Project("Empty Project", "EPROJ", "This is an empty project", someUser)
-    print(emptyProject)
+    empty_project = Project("Empty Project", "EPROJ", "This is an empty project", some_user)
+    print(empty_project)
 
     # build a sample project with categories and features
 
@@ -32,27 +31,27 @@ def test_model():
     feature4 = Feature("Display")
     feature5 = Feature("Keyboard")
 
-    category1.addFeature(feature1)
-    category1.addFeature(feature2)
-    category1.addFeature(feature3)
-    category2.addFeature(feature4)
-    category2.addFeature(feature5)
+    category1.add_feature(feature1)
+    category1.add_feature(feature2)
+    category1.add_feature(feature3)
+    category2.add_feature(feature4)
+    category2.add_feature(feature5)
 
-    sampleProject = Project("Sample Project", "SPROJ", "This is a sample project", someUser)
-    sampleProject.addCategory(category1)
-    sampleProject.addCategory(category2)
-    print(sampleProject)
+    sample_project = Project("Sample Project", "SPROJ", "This is a sample project", some_user)
+    sample_project.add_category(category1)
+    sample_project.add_category(category2)
+    print(sample_project)
 
     # try to insert existing features, nothing must be changed
-    sampleProject.addFeatureInCategory(feature1, category1)
-    sampleProject.addFeatureInCategory(feature1, category1)
-    print(sampleProject)
+    sample_project.add_feature_in_category(feature1, category1)
+    sample_project.add_feature_in_category(feature1, category1)
+    print(sample_project)
 
     # try to remove an existing feature, only one remove must work
-    sampleProject.removeFeatureFromCategory(feature1, category1)
-    sampleProject.removeFeatureFromCategory(feature1, category1)
-    sampleProject.removeFeatureFromCategory(feature1, category1)
-    print(sampleProject)
+    sample_project.remove_feature_from_category(feature1, category1)
+    sample_project.remove_feature_from_category(feature1, category1)
+    sample_project.remove_feature_from_category(feature1, category1)
+    print(sample_project)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
-from base_entity_model import Entity
-from profile_model import Profile
+from model.base_entity_model import Entity
+from model.profile_model import Profile
 
 
 class User(Entity):
@@ -12,8 +12,9 @@ class User(Entity):
     password = ""
     profile = Profile("")
 
-    def __init__(self, first_name="", last_name="", email="", password="", profile=None):
+    def __init__(self, id=0, first_name="", last_name="", email="", password="", profile=None):
         """Constructor with name."""
+        self.id = id
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
@@ -35,3 +36,4 @@ class User(Entity):
         """User representation."""
         return "User(id={0},firstName='{1}',lastName='{2}',email='{3}',Profile={4})'" \
             .format(self.id, self.first_name, self.last_name, self.email, self.profile)
+
