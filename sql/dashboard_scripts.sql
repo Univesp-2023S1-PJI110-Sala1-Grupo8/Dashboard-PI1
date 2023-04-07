@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`usuario` (
   CONSTRAINT `fk_usuario_perfil`
     FOREIGN KEY (`perfil_id`)
     REFERENCES `dashboard_db`.`perfil` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -52,11 +52,11 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `dashboard_db`.`projeto` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(45) NOT NULL,
+  `nome` VARCHAR(45) NOT NULL UNIQUE,
+  `nome_curto` VARCHAR(45) NULL UNIQUE,
+  `descricao` VARCHAR(45) NULL,
   `status` VARCHAR(45) NOT NULL,
   `usuario_id` INT NOT NULL,
-  `nome_curto` VARCHAR(45) NULL,
-  `descricao` VARCHAR(45) NULL,
   `data_estimada` DATE NULL,
   `percentual` DECIMAL(8,2) NULL,
   PRIMARY KEY (`id`),
@@ -64,8 +64,8 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`projeto` (
   CONSTRAINT `fk_projeto_usuario1`
     FOREIGN KEY (`usuario_id`)
     REFERENCES `dashboard_db`.`usuario` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -83,13 +83,13 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`usuario_permissao` (
   CONSTRAINT `fk_usuario_permissao_usuario1`
     FOREIGN KEY (`usuario_id`)
     REFERENCES `dashboard_db`.`usuario` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `fk_usuario_permissao_projeto1`
     FOREIGN KEY (`projeto_id`)
     REFERENCES `dashboard_db`.`projeto` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -106,8 +106,8 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`categoria` (
   CONSTRAINT `fk_categoria_projeto1`
     FOREIGN KEY (`projeto_id`)
     REFERENCES `dashboard_db`.`projeto` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -116,8 +116,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `dashboard_db`.`funcionalidade` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(45) NULL,
-  `nome_curto` VARCHAR(45) NULL,
+  `nome` VARCHAR(45) NULL UNIQUE,
+  `nome_curto` VARCHAR(45) NULL UNIQUE,
   `descricao` VARCHAR(45) NULL,
   `estimativa_conclusao` DATE NULL,
   `percentual_conclusao` DECIMAL(8,2) NULL,
@@ -131,13 +131,13 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`funcionalidade` (
   CONSTRAINT `fk_funcionalidade_categoria1`
     FOREIGN KEY (`categoria_id`)
     REFERENCES `dashboard_db`.`categoria` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `fk_funcionalidade_projeto1`
     FOREIGN KEY (`projeto_id`)
     REFERENCES `dashboard_db`.`projeto` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 CREATE USER IF NOT EXISTS 'dashboard_user'@'localhost' IDENTIFIED BY 'DashPass@2023';

@@ -1,5 +1,5 @@
-from base_entity_model import Entity
-from value_objects import FeatureStatus
+from model.base_entity_model import Entity
+from model.value_objects import FeatureStatus
 
 class Feature(Entity):
     """
@@ -12,11 +12,16 @@ class Feature(Entity):
     estimated_end_date = None
     status = FeatureStatus.NOT_STARTED
 
-    def __init__(self, name, short_name="", description=""):
+    def __init__(self, id=0, name="", short_name="", description="",
+                 percent_done=0, estimated_end_date=None, status=FeatureStatus.NOT_STARTED):
         """Constructor with arguments."""
+        self.id = id
         self.name = name
         self.short_name = short_name
         self.description = description
+        self.percent_done = percent_done
+        self.estimated_end_date = estimated_end_date
+        self.status = status
 
     def __eq__(self, other):
         if not isinstance(other, Feature):

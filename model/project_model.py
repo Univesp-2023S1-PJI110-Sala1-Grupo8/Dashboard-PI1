@@ -1,5 +1,5 @@
-from base_entity_model import Entity
-from value_objects import ProjectStatus
+from model.base_entity_model import Entity
+from model.value_objects import ProjectStatus
 
 
 class Project(Entity):
@@ -15,11 +15,14 @@ class Project(Entity):
     allowed_users = []
     feature_categories = []
 
-    def __init__(self, name, short_name="", description="", owner=None):
+    def __init__(self, id=0, name="", short_name="", description="", percent_done=0.0, status=ProjectStatus.ACTIVE, owner=None):
         """Constructor with arguments."""
+        self.id = id
         self.name = name
         self.short_name = short_name
         self.description = description
+        self.percent_done = percent_done
+        self.status = status
         self.owner = owner
         self.allowed_users = []
         self.feature_categories = []

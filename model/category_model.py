@@ -1,4 +1,4 @@
-from base_entity_model import Entity
+from model.base_entity_model import Entity
 
 
 class Category(Entity):
@@ -9,11 +9,13 @@ class Category(Entity):
         id      The category unique id.
         name    The category name.
     """
+    id = 0
     name = ""
     features = []
 
-    def __init__(self, name):
+    def __init__(self, id=0, name=""):
         """Constructor with name."""
+        self.id = id
         self.name = name
         self.features = []
 

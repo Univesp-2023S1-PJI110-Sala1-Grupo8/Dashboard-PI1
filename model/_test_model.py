@@ -21,15 +21,15 @@ def test_model():
 
     # build a sample project with categories and features
 
-    category1 = Category("Protocol")
-    category2 = Category("IHM")
+    category1 = Category(name="Protocol")
+    category2 = Category(name="IHM")
 
-    feature1 = Feature("TCP Protocol", "TCPP")
-    feature2 = Feature("UDP Protocol", "UDPP")
-    feature3 = Feature("ADP Protocol", "ADPP")
+    feature1 = Feature(name="TCP Protocol", short_name="TCPP")
+    feature2 = Feature(name="UDP Protocol", short_name="UDPP")
+    feature3 = Feature(name="ADP Protocol", short_name="ADPP")
 
-    feature4 = Feature("Display")
-    feature5 = Feature("Keyboard")
+    feature4 = Feature(name="Display")
+    feature5 = Feature(name="Keyboard")
 
     category1.add_feature(feature1)
     category1.add_feature(feature2)

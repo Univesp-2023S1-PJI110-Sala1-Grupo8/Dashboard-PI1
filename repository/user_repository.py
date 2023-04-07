@@ -18,15 +18,18 @@ class UserRepository(BaseRepository):
 
     def insert_user(self, user):
         try:
+            existing_user = self.find_user_by_email(user.email)
+            if existing_user is not None:
+                raise Exception("User with this email already exists (id = {})".format(existing_user.id))
             cursor = self.db.conn.cursor()
             cursor.execute(self.USER_REPO_SQL_DML_INSERT_USER, (
-                user.first_name, user.last_name, user.email, user.password, user.profile.id
-            ))
+                user.first_name, user.last_name, user.email, user.password, user.profile.id))
             cursor.close()
-            insertedUser = self.find_user_by_email(user.email)
-            if insertedUser is not None:
-                self.db.conn.commit()
-                return insertedUser
+            inserted_user = self.find_user_by_email(user.email)
+            if inserted_user is None:
+                raise Exception("User has not been inserted.")
+            self.db.conn.commit()
+            return inserted_user
         except mysql.connector.Error as err:
             self.report_error(err)
         return None
@@ -35,8 +38,7 @@ class UserRepository(BaseRepository):
         try:
             cursor = self.db.conn.cursor()
             cursor.execute(self.USER_REPO_SQL_DML_UPDATE_USER, (
-                user.first_name, user.last_name, user.email, user.password, user.profile.id, user.id
-            ))
+                user.first_name, user.last_name, user.email, user.password, user.profile.id, user.id))
             cursor.close()
             self.db.conn.commit()
             return self.find_user_by_id(user.id)
@@ -60,6 +62,8 @@ class UserRepository(BaseRepository):
             cursor = self.db.conn.cursor()
             cursor.execute(self.USER_REPO_SQL_DQL_GET_USER_BY_ID, (id,))
             row = cursor.fetchone()
+            if row is None:
+                return None
             profile = Profile(id=row[5], name=row[6])
             user = User(id=row[0], first_name=row[1], last_name=row[2],
                         email=row[3], password=row[4], profile=profile)
@@ -74,10 +78,11 @@ class UserRepository(BaseRepository):
             cursor = self.db.conn.cursor()
             cursor.execute(self.USER_REPO_SQL_DQL_GET_USER_BY_EMAIL, (email,))
             row = cursor.fetchone()
+            if row is None:
+                return None
             profile = Profile(id=row[5], name=row[6])
             user = User(id=row[0], first_name=row[1], last_name=row[2],
                         email=row[3], password=row[4], profile=profile)
-            cursor.reset()
             cursor.close()
             return user
         except mysql.connector.Error as err:
@@ -88,14 +93,14 @@ class UserRepository(BaseRepository):
         try:
             cursor = self.db.conn.cursor()
             cursor.execute(self.USER_REPO_SQL_DQL_GET_ALL_USERS)
-            resultList = []
+            result_list = []
             for (user_id, user_firstname, user_lastname, user_email, user_pass, profile_id, profile_desc) in cursor:
                 profile = Profile(id=profile_id, name=profile_desc)
                 user = User(id=user_id, first_name=user_firstname, last_name=user_lastname,
                             email=user_email, password=user_pass, profile=profile)
-                resultList.append(user)
+                result_list.append(user)
             cursor.close()
-            return resultList
+            return result_list
         except mysql.connector.Error as err:
             self.report_error(err)
         return None
