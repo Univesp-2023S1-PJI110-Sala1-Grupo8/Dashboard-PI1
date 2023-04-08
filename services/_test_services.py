@@ -1,4 +1,5 @@
 from model.user_model import User
+from model.profile_model import Profile
 from model.project_model import Project
 from model.feature_model import Feature
 from model.category_model import Category
@@ -133,6 +134,10 @@ def test_services():
 
     p = project_service.load_project_by_id(project.id)
     print_project(p)
+
+    user_martines = User(first_name="Fernando", last_name="Martines",
+                     password="123", email="martines", profile=Profile(2, ""))
+    user_services.add_new_user(user_martines)
 
     db.disconnect()
 
