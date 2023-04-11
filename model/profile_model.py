@@ -1,6 +1,7 @@
+from dataclasses import dataclass
 from model.base_entity_model import Entity
 
-
+@dataclass
 class Profile(Entity):
     """
     A class to represent the user's profile to access the application.

@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from model.base_entity_model import Entity
 from model.value_objects import ProjectStatus
 
-
+@dataclass
 class Project(Entity):
     """
     A class to represent the project entity.

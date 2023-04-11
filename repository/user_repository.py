@@ -6,7 +6,7 @@ from model.profile_model import Profile
 class UserRepository(BaseRepository):
     """User repository class responsible for maintain persisted user entities."""
 
-    USER_REPO_SQL_DQL_GET_ALL_USERS     = "SELECT u.id, u.nome, u.sobrenome, u.email, u.senha, u.perfil_id, p.descricao FROM usuario u INNER JOIN perfil p ON p.id = u.perfil_id"
+    USER_REPO_SQL_DQL_GET_ALL_USERS     = "SELECT u.id, u.nome, u.sobrenome, u.email, u.senha, u.perfil_id, p.descricao FROM usuario u INNER JOIN perfil p ON p.id = u.perfil_id WHERE u.id > 1 ORDER BY u.nome, u.sobrenome ASC"
     USER_REPO_SQL_DQL_GET_USER_BY_ID    = "SELECT u.id, u.nome, u.sobrenome, u.email, u.senha, u.perfil_id, p.descricao FROM usuario u INNER JOIN perfil p ON p.id = u.perfil_id WHERE u.id = %s"
     USER_REPO_SQL_DQL_GET_USER_BY_EMAIL = "SELECT u.id, u.nome, u.sobrenome, u.email, u.senha, u.perfil_id, p.descricao FROM usuario u INNER JOIN perfil p ON p.id = u.perfil_id WHERE u.email = %s"
     USER_REPO_SQL_DML_INSERT_USER       = "INSERT INTO usuario (nome, sobrenome, email, senha, perfil_id) VALUES (%s, %s, %s, %s, %s)"

@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+@dataclass
 class Entity:
     """
     A class to represent the base entity

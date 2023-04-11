@@ -18,6 +18,7 @@ class ProjectStatus:
 
 
 class UserProfile:
-    ADMIN = Profile(1, "Admin"),
-    GUEST = Profile(2, "Convidado"),
+    ADMIN = Profile(1, "Admin")
+    GUEST = Profile(2, "Convidado")
     PRODUCT_OWNER = Profile(3, "Product Owner")
+    List = [ADMIN, GUEST, PRODUCT_OWNER]

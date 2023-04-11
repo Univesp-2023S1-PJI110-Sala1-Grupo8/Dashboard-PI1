@@ -24,24 +24,153 @@
           {% with messages = get_flashed_messages() %}
           {% if messages %}
           {% for message in messages %}
-          <div class="alert alert-danger" role="alert">
-            {{ message }}
-          </div>
+            {% if message.startswith('.') %}
+            <div class="alert alert-success" role="alert">
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+            {% endif %}
+              {{ message }}
+            </div>
           {% endfor %}
           {% endif %}
           {% endwith %}
           <div class="form-group">
-            <input type="text" name="email" class="form-control" id="validationDefaultUsername" placeholder="Digite seu e-mail para realizar o login" autofocus="autofocus" required>
+            <input type="text" name="email" class="form-control" id="textUserName" placeholder="Digite seu e-mail para realizar o login" autofocus="autofocus" required>
           </div>
           <div class="form-group">
-            <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Digite a senha" required>
+            <input type="password" name="password" class="form-control" id="textPassword" placeholder="Digite a senha" required>
           </div>
           <button type="submit" class="btn btn-primary btn-lg btn-block">Acessar</button>
+          <br>
+          <div class="form-inline">
+            <div style="margin-left:0; margin-right:auto;"><button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#modalNewUser">Cadastrar-me no Sistema</button></div>
+            <div style="margin-left:auto; margin-right:0;"><button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#modalResetUserPassword">Esqueci a Senha</button></div>
+          </div>
         </form>
       </p>
     </div>
   </div>
 </div>
+
+<!-- New User Modal -->
+<form id="formNewUser" method="post" action="/usuario/novo">
+<div class="modal fade" id="modalNewUser" tabindex="-1" role="dialog" aria-labelledby="modalNewUserTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalNewUserTitle"> Novo Usuário </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <label for="textNewUserFirstName" class="col-sm-4 col-form-label">Primeiro Nome:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textNewUserFirstName" class="form-control" id="textNewUserFirstName" placeholder="Digite o seu primeiro nome" autofocus="autofocus" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textNewUserLastName" class="col-sm-4 col-form-label">Sobrenome:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textNewUserLastName" class="form-control" id="textNewUserLastName" placeholder="Digite o seu sobrenome" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textNewUserEmail" class="col-sm-4 col-form-label">E-mail:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textNewUserEmail" class="form-control" id="textNewUserEmail" placeholder="Digite o seu e-mail" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textNewUserPassword" class="col-sm-4 col-form-label">Senha:</label>
+          <div class="col-sm-8">
+            <input type="password" name="textNewUserPassword" class="form-control" id="textNewUserPassword" placeholder="Digite a sua senha" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Registrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+<!-- Reset Password Modal -->
+<form id="formForgotPassword" method="post" action="/usuario/zerar-senha">
+<div class="modal fade" id="modalResetUserPassword" tabindex="-1" role="dialog" aria-labelledby="modalResetUserPasswordTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalResetUserPasswordTitle">Reset de Senha</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <label for="textNewUserEmail" class="col-sm-4 col-form-label">E-mail</label>
+          <div class="col-sm-8">
+            <input type="text" name="textUserEmail" class="form-control" id="textUserEmail" placeholder="Digite o seu e-mail" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Zerar Senha</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+<!-- Change Password Modal -->
+<form id="formChangePassword" method="post" action="/usuario/trocar-senha">
+<div class="modal fade" id="modalChangeUserPassword" tabindex="-1" role="dialog" aria-labelledby="modalChangeUserPasswordTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modelChangeUserPasswordTitle">Alteração de Senha</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <label for="textNewUserEmail" class="col-sm-4 col-form-label">E-mail</label>
+          <div class="col-sm-8">
+            <input type="text" name="textUserEmail" class="form-control" id="textUserEmail" placeholder="Digite o seu e-mail" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textNewUserPassword" class="col-sm-4 col-form-label">Senha Antiga:</label>
+          <div class="col-sm-8">
+            <input type="password" name="textUserOldPassword" class="form-control" id="textUserOldPassword" placeholder="Digite a sua senha atual" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textNewUserPassword" class="col-sm-4 col-form-label">Nova Senha:</label>
+          <div class="col-sm-8">
+            <input type="password" name="textUserNewPassword" class="form-control" id="textUserNewPassword" placeholder="Digite a sua nova senha" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textNewUserPassword" class="col-sm-4 col-form-label">Nova Senha:</label>
+          <div class="col-sm-8">
+            <input type="password" name="textUserConfirmPassword" class="form-control" id="textUserConfirmPassword" placeholder="Confirme a sua nova senha" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Alterar Senha</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
 
 </body>
 </html>

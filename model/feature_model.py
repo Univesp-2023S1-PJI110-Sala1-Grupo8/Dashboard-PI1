@@ -1,6 +1,8 @@
+from dataclasses import dataclass
 from model.base_entity_model import Entity
 from model.value_objects import FeatureStatus
 
+@dataclass()
 class Feature(Entity):
     """
     A class to represent the feature entity.

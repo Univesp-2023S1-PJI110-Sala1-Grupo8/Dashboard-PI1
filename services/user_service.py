@@ -28,8 +28,11 @@ class UserService:
     def remove_user(self, user):
         return self.user_repository.delete_user(user.email)
 
+    def generate_random_password(self):
+        return ''.join(random.choices(string.ascii_lowercase, k=8))
+
     def reset_password(self, user):
-        generated_password = ''.join(random.choices(string.ascii_lowercase, k=8))
+        generated_password = self.generate_random_password()
         user.password = self.encode_user_password(generated_password)
         self.user_repository.update_user(user)
         print("=== Password Reset === User: {}, Pass:{}".format(user.email, generated_password))
@@ -53,3 +56,12 @@ class UserService:
         except Exception:
             print("Fail while trying to authenticate user '{}!'".format(email))
         return None
+
+    def admin_get_all_users(self):
+        return self.user_repository.get_all_users()
+
+    def find_user_by_id(self, user_id):
+        return self.user_repository.find_user_by_id(user_id)
+
+    def find_user_by_email(self, user_email):
+        return self.user_repository.find_user_by_email(user_email)

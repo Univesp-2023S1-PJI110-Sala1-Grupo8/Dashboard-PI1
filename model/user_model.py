@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from model.base_entity_model import Entity
 from model.profile_model import Profile
 
-
+@dataclass
 class User(Entity):
     """
     A class to represent the user entity.
@@ -31,4 +32,3 @@ class User(Entity):
         """User representation."""
         return "User(id={0},firstName='{1}',lastName='{2}',email='{3}',Profile={4})'" \
             .format(self.id, self.first_name, self.last_name, self.email, self.profile)
-

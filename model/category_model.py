@@ -1,6 +1,8 @@
+from dataclasses import dataclass
 from model.base_entity_model import Entity
 
 
+@dataclass
 class Category(Entity):
     """
     A class to represent the feature category.
