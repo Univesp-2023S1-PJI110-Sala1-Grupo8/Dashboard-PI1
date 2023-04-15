@@ -119,7 +119,7 @@ class ProjectRepository(BaseRepository):
             if user is None:
                 raise Exception("User not found by id {}.".format(user_id))
             cursor = self.db.conn.cursor()
-            cursor.execute(self.PROJECT_REPO_SQL_DQL_GET_ALL_PROJECTS)
+            cursor.execute(self.PROJECT_REPO_SQL_DQL_GET_ALL_PROJECTS, (user_id,))
             resultList = []
             for (project_id, project_name, project_shortname, project_descr, project_percent, project_status, user_id) in cursor:
                 project = Project(id=project_id, name=project_name, short_name=project_shortname,

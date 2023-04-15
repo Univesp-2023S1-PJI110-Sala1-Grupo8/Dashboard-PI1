@@ -24,7 +24,7 @@
         <a class="nav-link" href="#">Dashboard</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Projetos</a>
+        <a class="nav-link" href="/projetos">Projetos</a>
       </li>
     </ul>
     <form class="form-inline">
@@ -45,58 +45,56 @@
 
 <center>
 <div style="width:90%;">
-  <div>
-    <br>
-    <div style="">
-    <h2>Usuários Cadastrados</h2>
-    </div>
-    <br>
-  </div>
+  <table style="width:100%; margin-left:0; margin-right:auto;">
+    <tr>
+      <td width="100%">
+        <br><h2>Meus Projetos</h2><br>
+      </td>
+      <td width="*" style="margin-left:auto; margin-right:0;">
+        <button type="button" class="btn btn-primary">Novo&nbsp;Projeto</button>
+      </td>
+    </tr>
+  </table>
   <table class="table">
     <thead class="thead-light">
       <tr>
         <th scope="col">#</th>
-        <th scope="col">Nome do Usuário</th>
-        <th scope="col">E-mail</th>
-        <th scope="col">Perfil Atual</th>
-        <th scope="col">Alterar Perfil</th>
+        <th scope="col">Codinome</th>
+        <th scope="col">Nome do Projeto</th>
+        <th scope="col">Descrição</th>
+        <th scope="col">Status</th>
+        <th scope="col">Operações</th>
       </tr>
     </thead>
     <tbody>
-      {% for user in users %}
+      {% for project in projects %}
       <tr>
-        <th scope="row">{{ user.id }}</th>
-        <td>{{ user.first_name}} {{user.last_name}}</td>
-        <td>{{ user.email }}</td>
+        <th scope="row">{{ project.id }}</th>
+        <td>{{ project.short_name }}</td>
+        <td>{{ project.name }}</td>
+        <td>{{ project.description }}</td>
         <td>
-          {% if user.profile.id == 1 %}
-          <div class="alert-sm alert-danger text-center">
-          {% elif user.profile.id == 3 %}
-          <div class="alert-sm alert-info text-center">
+          {% if project.status == project_status.ACTIVE %}
+          <div class="alert-sm alert-primary text-center">
           {% else %}
           <div class="alert-sm alert-secondary text-center">
           {% endif %}
-          {{ user.profile.name }}
+            {{ project.status }}
           </div>
         </td>
         <td>
           <form id="change_profile_form" class="form-inline" method="post" action="/usuario/trocar-perfil">
-            <input type="hidden" name="user_id" value="{{ user.id }}"/>
-            <select class="custom-select-sm" name="new_profile">
-              {% for profile in profiles %}
-              <option value="{{ profile.id }}" {{ 'selected' if profile.name == user.profile.name else '' }}>{{ profile.name }}</option>
-              {% endfor %}
-            </select>&nbsp;
-            <button type="submit" class="btn btn-secondary btn-sm">Trocar</button>&nbsp;
+            <input type="hidden" name="project_id" value="{{ project.id }}"/>
+            <button type="submit" class="btn btn-outline-primary btn-sm">Editar</button>&nbsp;
             <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#modalRemoveUser"
-                    onclick="document.getElementById('user_id_to_remove').value = '{{ user.id }}';">Apagar</button>&nbsp;
+                    onclick="document.getElementById('user_id_to_remove').value = '{{ project.id }}';">Apagar</button>&nbsp;
           </form>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <p>{{ users|length }} usuários cadastrados.</p>
+  <p>{{ projects|length }} projetos cadastrados.</p>
 </div>
 </center>
 
