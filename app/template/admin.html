@@ -84,9 +84,10 @@
               {% for profile in profiles %}
               <option value="{{ profile.id }}" {{ 'selected' if profile.name == user.profile.name else '' }}>{{ profile.name }}</option>
               {% endfor %}
-            </select>
-            &nbsp;
-            <button type="submit" class="btn-sm btn-secondary">Trocar</button>
+            </select>&nbsp;
+            <button type="submit" class="btn btn-secondary btn-sm">Trocar</button>&nbsp;
+            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#modalRemoveUser"
+                    onclick="document.getElementById('user_id_to_remove').value = '{{ user.id }}';">Apagar</button>&nbsp;
           </form>
         </td>
       </tr>
@@ -96,6 +97,30 @@
   <p>{{ users|length }} usuários cadastrados.</p>
 </div>
 </center>
+
+<!-- Confirm User Removal Modal -->
+<form id="formRemoveUser" method="post" action="/usuario/remover">
+<input type="hidden" id="user_id_to_remove" name="user_id_to_remove" value="0"/>
+<div class="modal fade" id="modalRemoveUser" tabindex="-1" role="dialog" aria-labelledby="modalRemoveUserTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRemoveUserTitle">Remover Usuário</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Deseja realmente apagar este usuário?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
+        <button type="submit" class="btn btn-primary">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
 
 </body>
 </html>

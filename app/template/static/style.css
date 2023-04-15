@@ -1,5 +1,5 @@
 body {
-  background-color: #fda;
+  background-color: #fff;
   display:flex; flex-direction:column; justify-content:center;
   min-height:100vh;
 }}

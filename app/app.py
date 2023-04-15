@@ -38,7 +38,12 @@ def login():
         if user is not None:
             session["user_id"] = user.id
             session["user_name"] = user.first_name
+            session["user_email"] = user.email
             session["user_profile"] = user.profile.name
+            session["profile_id"] = user.profile.id
+            session["profile_name"] = user.profile.name
+            session["user_is_guest"] = user.profile.id == UserProfile.GUEST.id
+            session["user_is_po"] = user.profile.id == UserProfile.PRODUCT_OWNER.id
             trace("Session started! User: {} ({})".format(user.first_name, user.profile.name))
             return redirect("/home" if user.profile.id != 1 else "/admin")
         else:
@@ -142,7 +147,7 @@ def change_password():
 
     if user_new_pass != user_confirm_pass:
         flash("As senhas não coincidem.")
-        return redirect("/")
+        return redirect("/home")
 
     trace("Changing  User Password (E-mail: {}".format(user_email))
 
@@ -151,21 +156,40 @@ def change_password():
 
     if user is None:
         flash("Usuário não localizado.")
-        return redirect("/")
+        return redirect("/home")
 
     user = user_service.authenticate(user_email, user_old_pass)
     if user is None:
         flash("Acesso negado! Usuário ou senha inválidos.")
-        return redirect("/")
+        return redirect("/home")
 
     changed_pass = user_service.change_user_password(user, user_new_pass)
     if not changed_pass:
         flash("Falha ao trocar a senha. Contacte o Administrador.")
-        return redirect("/")
+        return redirect("/home")
 
     flash(".Senha alterado com sucesso!")
 
-    return redirect("/")
+    return redirect("/home")
+
+
+@app.route("/usuario/remover", methods=["POST"])
+def remove_user():
+    user_id_to_remove = request.form['user_id_to_remove']
+    trace("Removing User: {}".format(user_id_to_remove))
+
+    user_service = UserService(database)
+    user = user_service.find_user_by_id(user_id_to_remove)
+    if user is None:
+        flash("Falha ao remover o usuário (ID não localizado). Contacte o Administrador.")
+        return redirect("/admin")
+
+    user_was_removed = user_service.remove_user(user)
+    if not user_was_removed:
+        flash("Falha ao remover o usuário (Deleção falhou). Contacte o Administrador.")
+        return redirect("/home")
+
+    return redirect("/admin")
 
 
 if __name__ == "__main__":
