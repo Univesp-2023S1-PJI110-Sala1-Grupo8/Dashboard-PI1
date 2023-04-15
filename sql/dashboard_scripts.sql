@@ -52,9 +52,9 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `dashboard_db`.`projeto` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(45) NOT NULL UNIQUE,
+  `nome` VARCHAR(45) NOT NULL,
   `nome_curto` VARCHAR(45) NULL UNIQUE,
-  `descricao` VARCHAR(45) NULL,
+  `descricao` TEXT NULL,
   `status` VARCHAR(45) NOT NULL,
   `usuario_id` INT NOT NULL,
   `data_estimada` DATE NULL,
