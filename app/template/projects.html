@@ -11,7 +11,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">Dashboard</a>
+  <a class="navbar-brand" href="#"><h2><font color="lightgray">my</font>Dash!</h2></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -51,11 +51,20 @@
         <br><h2>Meus Projetos</h2><br>
       </td>
       <td width="*" style="margin-left:auto; margin-right:0;">
-        <button type="button" class="btn btn-primary">Novo&nbsp;Projeto</button>
+        <button type="button" id="buttonNewProject" class="btn btn-primary" data-toggle="modal" data-target="#modalNewProject"
+                onclick="document.getElementById('formNewProject').reset();
+                         document.getElementById('alert').style.display = 'none';
+                         document.getElementById('textProjectName').value = '';
+                         document.getElementById('textProjectShortName').value = '';
+                         document.getElementById('textProjectDescription').value = '';
+                         document.getElementById('selectProjectStatus').value = '{{ project_status.ACTIVE }}';
+                         setTimeout(function(){document.getElementById('textProjectShortName').focus();}, 500);">
+          Novo&nbsp;Projeto
+        </button>
       </td>
     </tr>
   </table>
-  <table class="table">
+  <table class="table table-bordered">
     <thead class="thead-light">
       <tr>
         <th scope="col">#</th>
@@ -70,7 +79,7 @@
       {% for project in projects %}
       <tr>
         <th scope="row">{{ project.id }}</th>
-        <td>{{ project.short_name }}</td>
+        <td><strong>{{ project.short_name }}</strong></td>
         <td>{{ project.name }}</td>
         <td>{{ project.description }}</td>
         <td>
@@ -83,39 +92,88 @@
           </div>
         </td>
         <td>
-          <form id="change_profile_form" class="form-inline" method="post" action="/usuario/trocar-perfil">
-            <input type="hidden" name="project_id" value="{{ project.id }}"/>
-            <button type="submit" class="btn btn-outline-primary btn-sm">Editar</button>&nbsp;
-            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#modalRemoveUser"
-                    onclick="document.getElementById('user_id_to_remove').value = '{{ project.id }}';">Apagar</button>&nbsp;
+          <form id="change_profile_form" class="form-inline" method="post" action="#">
+            <div style="white-space: nowrap;">
+              <input type="hidden" name="project_id" value="{{ project.id }}"/>
+              <button type="submit" class="btn btn-outline-primary btn-sm">Editar</button>&nbsp;
+              <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#modalRemoveUser"
+                      onclick="document.getElementById('user_id_to_remove').value = '{{ project.id }}';">Apagar</button>&nbsp;
+            </div>
           </form>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <p>{{ projects|length }} projetos cadastrados.</p>
+  <p>
+    {% if projects|length == 0 %}
+    Nenhum projeto cadastrado
+    {% elif projects|length == 1 %}
+    1 projeto cadastrado
+    {% else %}
+    {{ projects|length }} projetos cadastrados
+    {% endif %}
+  </p>
 </div>
 </center>
 
-<!-- Confirm User Removal Modal -->
-<form id="formRemoveUser" method="post" action="/usuario/remover">
-<input type="hidden" id="user_id_to_remove" name="user_id_to_remove" value="0"/>
-<div class="modal fade" id="modalRemoveUser" tabindex="-1" role="dialog" aria-labelledby="modalRemoveUserTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+<!-- New Project Modal -->
+<form id="formNewProject" method="post" action="/projeto/novo">
+<div class="modal fade" id="modalNewProject" role="dialog" aria-labelledby="modalNewProjectTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalRemoveUserTitle">Remover Usuário</h5>
+        <h5 class="modal-title" id="modalNewProjectTitle"> Novo Projeto </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p>Deseja realmente apagar este usuário?</p>
+        <div class="form-group row">
+          <div class="col-sm-12">
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <script>document.getElementById('buttonNewProject').click();</script>
+              {% for message in messages %}
+                <div id="alert" class="alert alert-danger fade show" role="alert">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textProjectShortName" class="col-sm-4 col-form-label">Codinome:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textProjectShortName" class="form-control" id="textProjectShortName" value="{{ project.short_name }}" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textProjectName" class="col-sm-4 col-form-label">Nome do Projeto:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textProjectName" class="form-control" id="textProjectName" value="{{ project.name }}" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textProjectDescription" class="col-sm-4 col-form-label">Descrição:</label>
+          <div class="col-sm-8">
+            <textarea name="textProjectDescription" class="form-control" id="textProjectDescription" rows="4">{{ project.description }}</textarea>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="selectProjectStatus" class="col-sm-4 col-form-label">Status:</label>
+          <div class="col-sm-8">
+            <select class="custom-select" id="selectProjectStatus" name="selectProjectStatus">
+              <option value="{{ project_status.ACTIVE }}" {{ 'selected' if project.status == project_status.ACTIVE else '' }}>{{ project_status.ACTIVE }}</option>
+              <option value="{{  project_status.INACTIVE }}" {{ 'selected' if project.status == project_status.INACTIVE else '' }}>{{ project_status.INACTIVE }}</option>
+            </select>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
-        <button type="submit" class="btn btn-primary">Sim</button>
+        <button type="submit" class="btn btn-primary">&nbsp;&nbsp;Gravar&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
       </div>
     </div>
   </div>

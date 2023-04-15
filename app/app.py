@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect, request, session, flash
 from flask_session import Session
 from model.user_model import User
 from model.profile_model import Profile
+from model.project_model import Project
 from model.value_objects import UserProfile
 from model.value_objects import ProjectStatus
 from repository._database import Database
@@ -188,21 +189,59 @@ def remove_user():
     return redirect("/admin")
 
 
-@app.route("/projetos", methods=["GET"])
-def list_projects():
+def current_session_po_user():
     user_id = session["user_id"]
     user = user_service.find_user_by_id(user_id)
     if user is None:
         flash("Sessão Inválida.")
-        return redirect("/")
+        return None
     if user.profile.id != UserProfile.PRODUCT_OWNER.id:
         flash("Sem permissão para esta opção.")
+        return None
+    return user
+
+@app.route("/projetos", methods=["GET"])
+def list_projects():
+    user = current_session_po_user()
+    if user is None:
         return redirect("/")
     projects = project_service.get_all_projects_of_user(user)
     if projects is None:
         flash("Falha ao carregar os projetos.")
         return redirect("/projetos")
-    return render_template("projects.html", projects=projects, project_status=ProjectStatus)
+    project = Project()
+    return render_template("projects.html", projects=projects, project_status=ProjectStatus, project=project)
+
+
+@app.route("/projeto/novo", methods=["POST"])
+def new_project():
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+    projects = project_service.get_all_projects_of_user(user)
+    if projects is None:
+        flash("Falha ao carregar os projetos. Contacte o Administrador.")
+        return redirect("/")
+
+    project_shortname = request.form["textProjectShortName"]
+    project_name = request.form["textProjectName"]
+    project_description = request.form["textProjectDescription"]
+    project_status = request.form["selectProjectStatus"]
+
+    project = Project(id=0, short_name=project_shortname, name=project_name,
+                      description=project_description, status=project_status,
+                      owner=user)
+    try:
+        project = project_service.add_new_project(project)
+        if project is not None:
+            return redirect("/projetos")
+        flash("Falha ao gravar o projeto.")
+    except Exception as err:
+        err_string = str(err)
+        if "exist" in err_string:
+            flash("Projeto já existente com este codinome informado.")
+
+    return render_template("projects.html", projects=projects, project_status=ProjectStatus, project=project)
 
 
 if __name__ == "__main__":
