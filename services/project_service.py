@@ -4,6 +4,7 @@ from repository.feature_repository import FeatureRepository
 from repository.category_repository import CategoryRepository
 from repository.permission_repository import PermissionRepository
 
+
 class ProjectService:
 
     def __init__(self, database):
@@ -88,3 +89,6 @@ class ProjectService:
         except:
             return False
         return True
+
+    def find_project_by_id(self, project_id):
+        return self.project_repository.find_project_by_id(project_id)

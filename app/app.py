@@ -244,5 +244,23 @@ def new_project():
     return render_template("projects.html", projects=projects, project_status=ProjectStatus, project=project)
 
 
+@app.route("/projeto/remover", methods=["POST"])
+def remove_project():
+    project_id_to_remove = request.form['project_id_to_remove']
+    trace("Removing Project: {}".format(project_id_to_remove))
+
+    project = project_service.find_project_by_id(project_id_to_remove)
+    if project is None:
+        flash("Falha ao remover o projeto (ID não localizado). Contacte o Administrador.")
+        return redirect("/home")
+
+    project_was_removed = project_service.remove_project(project)
+    if not project_was_removed:
+        flash("Falha ao remover o projeto (Deleção falhou). Contacte o Administrador.")
+        return redirect("/home")
+
+    return redirect("/projetos")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
