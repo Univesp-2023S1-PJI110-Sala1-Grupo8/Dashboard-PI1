@@ -12,7 +12,7 @@
 <body style="background-color:#cacacf">
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="#"><h2><font color="lightgray">my</font>Dash!</h2></a>
+  <a class="navbar-brand" href="/home"><h2><font color="lightgray">my</font>Dash!</h2></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -21,8 +21,13 @@
       <li class="nav-link dropdown active">
         <a class="nav-link nav-item dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">Dashboards</a>
         <div class="dropdown-menu">
-          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#modalChangeUserPassword">PROJ1</a>
-          <a class="dropdown-item" href="/logout">PROJ2</a>
+        {% if projects|length <= 0 %}
+          <a class="dropdown-item" href="#">Nenhum projeto disponível</a>
+        {% else %}
+          {% for project in projects %}
+          <a class="dropdown-item" href="/dashboard/{{ project.id }}">{{ project.short_name }}</a>
+          {% endfor %}
+        {% endif %}
         </div>
       </li>
       {% if session['user_is_po'] %}

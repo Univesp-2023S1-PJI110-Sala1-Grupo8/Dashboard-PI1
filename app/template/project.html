@@ -53,89 +53,66 @@
 
 <center>
 <div style="width:90%;">
+  <br>
   <table style="width:100%; margin-left:0; margin-right:auto;">
     <tr>
       <td width="100%">
-        <br><h2>Meus Projetos</h2><br>
+        <h1>{{ project.short_name }}</h1>
       </td>
-      <td width="*" style="margin-left:auto; margin-right:0;">
-        <button type="button" id="buttonNewProject" class="btn btn-primary" data-toggle="modal" data-target="#modalNewProject"
-                onclick="document.getElementById('formNewProject').reset();
+      <td width="*" style="white-space:nowrap; margin-left:auto; margin-right:0; vertical-align:middle;">
+        <button type="button" id="buttonEditProject" class="btn btn-primary" data-toggle="modal" data-target="#modalEditProject"
+                onclick="document.getElementById('textProjectId').value = '{{ project.id }}';
                          document.getElementById('alert').style.display = 'none';
-                         document.getElementById('textProjectName').value = '';
-                         document.getElementById('textProjectShortName').value = '';
-                         document.getElementById('textProjectDescription').value = '';
-                         document.getElementById('selectProjectStatus').value = '{{ project_status.ACTIVE }}';
                          setTimeout(function(){document.getElementById('textProjectShortName').focus();}, 500);">
-          Novo&nbsp;Projeto
+          Editar&nbsp;Dados
+        </button>
+        <button type="button" id="buttonRemoveProject" class="btn btn-danger" data-toggle="modal" data-target="#modalRemoveProject"
+                onclick="document.getElementById('project_id_to_remove').value = '{{ project.id }}';">
+          &nbsp;Remover&nbsp;
+        </button>
+        <button type="button" id="buttonClose" class="btn btn-secondary" onclick="document.location='/projetos';">
+          &nbsp;&nbsp;Fechar&nbsp;&nbsp;
         </button>
       </td>
     </tr>
   </table>
-  <table class="table table-bordered">
-    <thead class="thead-light">
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Codinome</th>
-        <th scope="col">Nome do Projeto</th>
-        <th scope="col">Descrição</th>
-        <th scope="col">Status</th>
-        <th scope="col">Operações</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for project in projects %}
-      <tr>
-        <th scope="row">{{ project.id }}</th>
-        <td><strong>{{ project.short_name }}</strong></td>
-        <td>{{ project.name }}</td>
-        <td>
-          {% autoescape false %}
-          {{ project.description|replace('\r\n', '<br>') }}
-          {% endautoescape %}
-        </td>
-        <td>
-          {% if project.status == project_status.ACTIVE %}
-          <div class="alert-sm alert-primary text-center">
-          {% else %}
-          <div class="alert-sm alert-secondary text-center">
-          {% endif %}
-            {{ project.status }}
-          </div>
-        </td>
-        <td>
-          <form id="change_project_form" class="form-inline" method="post" action="/projeto/{{ project.id }}">
-            <div style="white-space: nowrap;">
-              <input type="hidden" name="project_id" value="{{ project.id }}"/>
-              <button type="submit" class="btn btn-outline-primary btn-sm">Editar</button>&nbsp;
-              <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#modalRemoveProject"
-                      onclick="document.getElementById('project_id_to_remove').value = '{{ project.id }}';">Apagar</button>&nbsp;
-            </div>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
+  <hr>
+  <table style="width:100%;">
+    <tr>
+      <td width="100%" style="margin-left:auto; margin-right:0;">
+        <h3>{{ project.name }}</h3>
+      </td>
+      <td width="*" style="vertical-align:top;">
+        {% if project.status == project_status.ACTIVE %}
+        <div class="alert-sm alert-primary text-center" style="width:60px;">
+        {% else %}
+        <div class="alert-sm alert-secondary text-center" style="width:60px;">
+        {% endif %}
+          {{ project.status }}
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td width="100%" style="margin-left:auto; margin-right:0;">
+        {% autoescape false %}
+        {{ project.description|replace('\r\n', '<br>') }}
+        {% endautoescape %}
+      </td>
+    </tr>
   </table>
-  <p>
-    {% if projects|length == 0 %}
-    Nenhum projeto cadastrado
-    {% elif projects|length == 1 %}
-    1 projeto cadastrado
-    {% else %}
-    {{ projects|length }} projetos cadastrados
-    {% endif %}
-  </p>
-</div>
+
+  <hr>
+  </div>
 </center>
 
-<!-- New Project Modal -->
-<form id="formNewProject" method="post" action="/projeto/incluir">
-<div class="modal fade" id="modalNewProject" role="dialog" aria-labelledby="modalNewProjectTitle" aria-hidden="true">
+<!-- Edit Project Modal -->
+<form id="formEditProject" method="post" action="/projeto/alterar">
+<input type="hidden" id="textProjectId" name="textProjectId" value="0"/>
+<div class="modal fade" id="modalEditProject" role="dialog" aria-labelledby="modalEditProjectTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalNewProjectTitle"> Novo Projeto </h5>
+        <h5 class="modal-title" id="modalEditProjectTitle"> Alterar Dados do Projeto </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -145,7 +122,7 @@
           <div class="col-sm-12">
           {% with messages = get_flashed_messages() %}
             {% if messages %}
-              <script>document.getElementById('buttonNewProject').click();</script>
+              <script>document.getElementById('buttonEditProject').click();</script>
               {% for message in messages %}
                 <div id="alert" class="alert alert-danger fade show" role="alert">
                   {{ message }}
@@ -184,7 +161,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">&nbsp;&nbsp;Gravar&nbsp;&nbsp;</button>
+        <button type="submit" class="btn btn-primary">&nbsp;&nbsp;Alterar&nbsp;&nbsp;</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
       </div>
     </div>
@@ -205,7 +182,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>Deseja realmente apagar este projeto?</p>
+        <p>Deseja realmente remover este projeto?</p>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-danger" style="width:100px;">Sim</button>

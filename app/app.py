@@ -64,11 +64,21 @@ def logout():
     return redirect("/")
 
 
+def list_all_projects_of_user_in_current_session():
+    if not session.get("user_id"):
+        return []
+    user_id = session.get("user_id")
+    user = user_service.find_user_by_id(user_id)
+    return project_service.get_all_projects_of_user(user)
+
+
 @app.route("/home")
 def home():
+
     if not session.get("user_id"):
         return redirect("/login")
-    return render_template("home.html")
+    projects = list_all_projects_of_user_in_current_session()
+    return render_template("home.html", projects=projects)
 
 
 @app.route("/admin")
@@ -97,7 +107,7 @@ def change_profile():
     return redirect("/admin")
 
 
-@app.route("/usuario/novo", methods=["POST"])
+@app.route("/usuario/incluir", methods=["POST"])
 def new_user():
     new_user_first_name = request.form['textNewUserFirstName']
     new_user_last_name = request.form['textNewUserLastName']
@@ -195,7 +205,7 @@ def current_session_po_user():
     if user is None:
         flash("Sessão Inválida.")
         return None
-    if user.profile.id != UserProfile.PRODUCT_OWNER.id:
+    if user.profile.id != UserProfile.PRODUCT_OWNER.id and user.profile.id != UserProfile.ADMIN.id:
         flash("Sem permissão para esta opção.")
         return None
     return user
@@ -213,7 +223,7 @@ def list_projects():
     return render_template("projects.html", projects=projects, project_status=ProjectStatus, project=project)
 
 
-@app.route("/projeto/novo", methods=["POST"])
+@app.route("/projeto/incluir", methods=["POST"])
 def new_project():
     user = current_session_po_user()
     if user is None:
@@ -244,8 +254,44 @@ def new_project():
     return render_template("projects.html", projects=projects, project_status=ProjectStatus, project=project)
 
 
+@app.route("/projeto/alterar", methods=["POST"])
+def edit_project():
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+    projects = project_service.get_all_projects_of_user(user)
+    if projects is None:
+        flash("Falha ao carregar os projetos. Contacte o Administrador.")
+        return redirect("/")
+
+    project_id = request.form["textProjectId"]
+    project_shortname = request.form["textProjectShortName"]
+    project_name = request.form["textProjectName"]
+    project_description = request.form["textProjectDescription"]
+    project_status = request.form["selectProjectStatus"]
+
+    project = Project(id=project_id, short_name=project_shortname, name=project_name,
+                      description=project_description, status=project_status,
+                      owner=user)
+    try:
+        project = project_service.change_project_data(project)
+        if project is not None:
+            return redirect("/projeto/{}".format(project_id))
+        flash("Falha ao alterar o projeto.")
+    except Exception as err:
+        err_string = str(err)
+        if "exist" in err_string:
+            flash("Projeto já existente com este codinome informado.")
+
+    return render_template("project.html", project=project, project_status=ProjectStatus)
+
+
 @app.route("/projeto/remover", methods=["POST"])
 def remove_project():
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+
     project_id_to_remove = request.form['project_id_to_remove']
     trace("Removing Project: {}".format(project_id_to_remove))
 
@@ -260,6 +306,20 @@ def remove_project():
         return redirect("/home")
 
     return redirect("/projetos")
+
+
+@app.route("/projeto/<project_id>", methods=["GET", "POST"])
+def change_project(project_id):
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+
+    project = project_service.find_project_by_id(project_id)
+    if project is None:
+        flash("Projeto não localizado (ID: {}).".format(project_id))
+        return redirect("/home")
+
+    return render_template("project.html", project=project, project_status=ProjectStatus)
 
 
 if __name__ == "__main__":
