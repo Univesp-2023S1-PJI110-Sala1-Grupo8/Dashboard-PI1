@@ -37,7 +37,7 @@ class CategoryRepository(BaseRepository):
     def update_category(self, category):
         try:
             cursor = self.db.conn.cursor()
-            cursor.execute(self.CATEGORY_REPO_SQL_DML_UPDATE_CATEGORY, (category.name,))
+            cursor.execute(self.CATEGORY_REPO_SQL_DML_UPDATE_CATEGORY, (category.name, category.id))
             cursor.close()
             self.db.conn.commit()
             return self.find_category_by_id(category.id)

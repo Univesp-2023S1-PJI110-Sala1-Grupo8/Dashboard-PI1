@@ -32,6 +32,7 @@ class ProjectService:
         project.feature_categories = self.category_repository.get_all_categories_in_project(project.id)
         for category in project.feature_categories:
             category.features = self.feature_repository.get_all_features_in_category(category.id)
+        project.count_total_of_features()
         return project
 
     def activate_project(self, project):
@@ -92,3 +93,6 @@ class ProjectService:
 
     def find_project_by_id(self, project_id):
         return self.project_repository.find_project_by_id(project_id)
+
+    def find_category_by_id(self, category_id):
+        return self.category_repository.find_category_by_id(category_id)

@@ -19,6 +19,7 @@ class Project(Entity):
         self.owner = owner
         self.allowed_users = []
         self.feature_categories = []
+        self.total_of_features = 0
 
     def __eq__(self, other):
         if not isinstance(other, Project):
@@ -50,10 +51,12 @@ class Project(Entity):
     def add_category(self, category):
         if category is not None:
             self.feature_categories.append(category)
+        self.count_total_of_features()
 
     def remove_category(self, category):
         if category is not None:
             self.feature_categories.remove(category)
+        self.count_total_of_features()
 
     def find_category(self, category):
         return next((c for c in self.feature_categories if c == category), None)
@@ -63,6 +66,7 @@ class Project(Entity):
             category_in_list = self.find_category(category)
             if category_in_list is None:
                 category_in_list.features.append(category)
+        self.count_total_of_features()
 
     def remove_feature_from_category(self, feature, category):
         if category is not None and feature is not None:
@@ -70,10 +74,12 @@ class Project(Entity):
             if category_in_list is not None:
                 try:
                     category_in_list.features.remove(feature)
+                    self.count_total_of_features()
                     return True
                 except ValueError:
                     return False
         return False
 
     def count_total_of_features(self):
-        return sum([len(c.features) for c in self.feature_categories])
+        self.total_of_features = sum([len(c.features) for c in self.feature_categories])
+        return self.total_of_features

@@ -24,6 +24,8 @@ class FeatureRepository(BaseRepository):
             existing_feature = self.find_feature_in_project_by_name(feature.name, project_id)
             if existing_feature is not None:
                 raise Exception("Feature with this name already exists in project (id = {})".format(existing_feature.id))
+            if feature.estimated_end_date == '':
+                feature.estimated_end_date = None;
             cursor = self.db.conn.cursor()
             cursor.execute(self.FEATURE_REPO_SQL_DML_INSERT_FEATURE,
                            (feature.name, feature.short_name, feature.description, feature.estimated_end_date,
@@ -40,6 +42,8 @@ class FeatureRepository(BaseRepository):
 
     def update_feature(self, feature):
         try:
+            if feature.estimated_end_date == '':
+                feature.estimated_end_date = None;
             cursor = self.db.conn.cursor()
             cursor.execute(self.FEATURE_REPO_SQL_DML_UPDATE_FEATURE,
                            (feature.name, feature.short_name, feature.description, feature.estimated_end_date,
@@ -71,6 +75,8 @@ class FeatureRepository(BaseRepository):
                 return None
             feature = Feature(id=row[0], name=row[1], short_name=row[2], description=row[3],
                               estimated_end_date=row[4], percent_done=row[5], status=row[6])
+            if feature.estimated_end_date is None:
+                feature.estimated_end_date = ''
             cursor.close()
             return feature
         except mysql.connector.Error as err:
@@ -86,6 +92,8 @@ class FeatureRepository(BaseRepository):
                 return None
             feature = Feature(id=row[0], name=row[1], short_name=row[2], description=row[3],
                               estimated_end_date=row[4], percent_done=row[5], status=row[6])
+            if feature.estimated_end_date is None:
+                feature.estimated_end_date = ''
             cursor.close()
             return feature
         except mysql.connector.Error as err:
@@ -102,6 +110,8 @@ class FeatureRepository(BaseRepository):
                 feature = Feature(id=feature_id, name=feature_name, short_name=feature_shortname,
                                   description=feature_descr, percent_done=feature_percentdone,
                                   estimated_end_date=feature_enddate, status=feature_status)
+                if feature.estimated_end_date is None:
+                    feature.estimated_end_date = ''
                 resultList.append(feature)
             cursor.close()
             return resultList

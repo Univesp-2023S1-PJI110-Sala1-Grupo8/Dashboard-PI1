@@ -62,7 +62,7 @@
       <td width="*" style="white-space:nowrap; margin-left:auto; margin-right:0; vertical-align:middle;">
         <button type="button" id="buttonEditProject" class="btn btn-primary" data-toggle="modal" data-target="#modalEditProject"
                 onclick="document.getElementById('textProjectId').value = '{{ project.id }}';
-                         document.getElementById('alert').style.display = 'none';
+                         document.getElementById('project-alert').style.display = 'none';
                          setTimeout(function(){document.getElementById('textProjectShortName').focus();}, 500);">
           Editar&nbsp;Dados
         </button>
@@ -79,7 +79,7 @@
   <hr>
   <table style="width:100%;">
     <tr>
-      <td width="100%" style="margin-left:auto; margin-right:0;">
+      <td width="100%" class="text-left">
         <h3>{{ project.name }}</h3>
       </td>
       <td width="*" style="vertical-align:top;">
@@ -100,10 +100,131 @@
       </td>
     </tr>
   </table>
-
   <hr>
-  </div>
+  <table class="table table-borderless table-sm">
+    <thead>
+      <tr>
+        <th scope="col" colspan="5">
+          <h4>Funcionalidades</h4>
+        </th>
+        <th scope="col" colspan="1" class="text-right align-middle">
+            <button type="button" id="buttonNewCategory" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#modalCategory"
+                    onclick="document.getElementById('formCategory').reset();
+                             document.getElementById('category_op').value = 'add';
+                             document.getElementById('category_id').value = '0';
+                             setTimeout(function(){document.getElementById('textCategoryName').focus();}, 700);">
+              Nova Categoria
+            </button>
+            <button type="button" id="buttonFeature" data-toggle="modal" data-target="#modalFeature"
+                    style="display:none;"
+                    onclick="document.getElementById('formFeature').reset();
+                             document.getElementById('feature_id').value = '0';
+                             setTimeout(function(){document.getElementById('textFeatureShortName').focus();}, 500);">
+            </button>
+        </th>
+      </tr>
+    </thead>
+    <!--
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Funcionalidade</th>
+        <th scope="col">Status</th>
+        <th scope="col">Percentual</th>
+        <th scope="col">Estimativa</th>
+        <th scope="col">Operações</th>
+      </tr>
+    </thead>
+    -->
+  </table>
+  {% for category in project.feature_categories %}
+  <table class="table table-sm">
+    <thead>
+      <tr class="table" style="background-color: #f0f0f0;">
+        <th scope="col" colspan="2">
+          <h5>{{ category.name }}</h5>
+        </th>
+        <th scope="col" colspan="4" class="text-right align-middle"">
+          <button type="button" id="buttonNewFeatureCategory{{category.id}}" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#modalFeature"
+                  onclick="document.getElementById('formFeature').reset();
+                           document.getElementById('feature_op').value = 'add';
+                           document.getElementById('feature_id').value = '0';
+                           document.getElementById('feature_category_id').value = '{{ category.id }}';
+                           setTimeout(function(){document.getElementById('textFeatureShortName').focus();}, 500);">
+            Nova Funcionalidade
+          </button>
+          <button type="button" id="buttonEditCategory" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#modalCategory"
+                  onclick="document.getElementById('formCategory').reset();
+                           document.getElementById('category_op').value = 'edit';
+                           document.getElementById('category_id').value = '{{ category.id }}';
+                           document.getElementById('textCategoryName').value = '{{ category.name }}';
+                           setTimeout(function(){document.getElementById('textCategoryName').focus();}, 500);">
+            Editar
+          </button>
+          <button type="button" id="buttonRemoveCategory" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#modalRemoveCategory"
+                  onclick="document.getElementById('category_op').value = 'del';
+                           document.getElementById('category_id').value = '{{ category.id }}';">
+            &nbsp;Excluir&nbsp;
+          </button>
+        </th>
+      </tr>
+    </thead>
+    {% for feature in category.features %}
+    <tbody>
+      <tr style="vertical-align:middle;">
+        <th scope="row" style="width:10px; white-space:nowrap;vertical-align:middle;">{{ feature.short_name }}</th>
+        <td style="width:*; white-space:nowrap;vertical-align:middle;">{{ feature.name }}</td>
+        <td style="width:100px;vertical-align:middle;white-space:nowrap;">
+          {{ '' if feature.estimated_end_date == '' else 'Conclusão em: ' }}
+          <strong>{{ '' if feature.estimated_end_date == '' else feature.estimated_end_date.strftime('%d/%m/%Y') }}</strong>
+        </td>
+        <td style="width:50px;vertical-align:middle; white-space:nowrap;">Feito: <strong>{{ feature.percent_done|round|int }}%</strong></td>
+        <td style="width:155px; white-space:nowrap;vertical-align:middle;">
+          <div style="padding:5px; border:1px solid black; border-radius:5px;
+                      background-color:{{ feature_status.color(feature.status)[0] }};
+                      color:{{ feature_status.color(feature.status)[1] }};text-align:center">
+            <strong>{{ feature.status }}</strong>
+          </div>
+        </td>
+        <td style="width:136px; text-align:middle; white-space:nowrap;">
+          <div class="form-inline text-right">
+            <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#modalFeature"
+                    onclick="document.getElementById('formFeature').reset();
+                             document.getElementById('feature_op').value = 'edit';
+                             document.getElementById('feature_id').value = '{{ feature.id }}';
+                             document.getElementById('feature_category_id').value = '{{ category.id }}';
+                             document.getElementById('textFeatureName').value = '{{ feature.name }}';
+                             document.getElementById('textFeatureShortName').value = '{{ feature.short_name }}';
+                             document.getElementById('textFeaturePercent').value = '{{ feature.percent_done|round|int }}';
+                             document.getElementById('textFeatureEndDate').value = '{{ '' if feature.estimated_end_date == '' else feature.estimated_end_date.strftime('%d/%m/%Y') }}';
+                             document.getElementById('selectFeatureStatus').value = '{{ feature.status }}';
+                             setTimeout(function(){document.getElementById('textFeatureShortName').focus();}, 500);">
+              Editar</button>&nbsp;
+            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#modalRemoveFeature"
+                    onclick="document.getElementById('feature_op').value = 'del';
+                             document.getElementById('feature_id').value = '{{ feature.id }}';
+                             document.getElementById('feature_category_id').value = '{{ category.id }}';">
+              Excluir</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table>
+  {% endfor %}
+  <p>
+    {% if project.total_of_features == 0 %}
+    Nenhuma funcionalidade cadastrada
+    {% elif project.total_of_features == 1 %}
+    1 funcionalidade cadastrada
+    {% else %}
+    {{ project.total_of_features }} funcionalidades cadastradas
+    {% endif %}
+  </p>
+</div>
 </center>
+
+{% with messages = get_flashed_messages() %}
 
 <!-- Edit Project Modal -->
 <form id="formEditProject" method="post" action="/projeto/alterar">
@@ -120,16 +241,16 @@
       <div class="modal-body">
         <div class="form-group row">
           <div class="col-sm-12">
-          {% with messages = get_flashed_messages() %}
             {% if messages %}
-              <script>document.getElementById('buttonEditProject').click();</script>
               {% for message in messages %}
-                <div id="alert" class="alert alert-danger fade show" role="alert">
+                {% if 'projeto' in message|lower %}
+                <script>document.getElementById('buttonEditProject').click();</script>
+                <div id="alert-project" class="alert alert-danger fade show" role="alert">
                   {{ message }}
                 </div>
+                {% endif %}
               {% endfor %}
             {% endif %}
-          {% endwith %}
           </div>
         </div>
         <div class="form-group row">
@@ -192,6 +313,231 @@
   </div>
 </div>
 </form>
+
+<!-- New/Edit Category Modal -->
+<form id="formCategory" method="post" action="/projeto/{{ project.id }}/categoria">
+<input type="hidden" id="category_op" name="category_op" value="add"/>
+<input type="hidden" id="category_id" name="category_id" value="0"/>
+<div class="modal fade" id="modalCategory" tabindex="-1" role="dialog" aria-labelledby="modalCategoryTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCategoryTitle">Categoria</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <div class="col-sm-12">
+            {% if messages %}
+              {% for message in messages %}
+                {% if 'categoria' in message|lower %}
+                <script>document.getElementById('buttonNewCategory').click();</script>
+                <div id="alert-category" class="alert alert-danger fade show" role="alert">
+                  {{ message }}
+                </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textCategoryName" class="col-sm-4 col-form-label">Descrição</label>
+          <div class="col-sm-8">
+            <input type="text" name="textCategoryName" class="form-control" id="textCategoryName" placeholder="" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" style="width:90px;">Salvar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Category Removal Modal -->
+<div class="modal fade" id="modalRemoveCategory" tabindex="-1" role="dialog" aria-labelledby="modalRemoveCategoryTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRemoveCategoryTitle">Remover Categoria</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Deseja realmente remover esta categoria?</p>
+        <p class="alert-danger">IMPORTANTE: Todas as funcionalidades associadas à esta categorias sejam removidas também.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="document.getElementById('formCategory').submit();" style="width:100px;">Sim</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width:100px;">Não</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+<!-- New/Edit Feature Modal -->
+<script type="text/javascript">
+
+function isValidDate(dateString)
+{
+  if (dateString == '')
+    return true;
+
+  // First check for the pattern
+  if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString))
+    return false;
+
+  // Parse the date parts to integers
+  var parts = dateString.split("/");
+  var day = parseInt(parts[0], 10);
+  var month = parseInt(parts[1], 10);
+  var year = parseInt(parts[2], 10);
+
+  // Check the ranges of month and year
+  if(year < 1000 || year > 3000 || month == 0 || month > 12)
+    return false;
+
+  var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+  // Adjust for leap years
+  if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+      monthLength[1] = 29;
+
+  // Check the range of the day
+  return day > 0 && day <= monthLength[month - 1];
+};
+
+function isValidPercent(percent)
+{
+  return !(isNaN(percent) || percent < 0 || percent > 100)
+}
+
+function validateFeatureForm()
+{
+  dateInput = document.getElementById('textFeatureEndDate');
+  percentInput = document.getElementById('textFeaturePercent');
+
+  alertDiv = document.getElementById('alert-feature-validation');
+
+  if(!isValidDate(dateInput.value)){
+    dateInput.focus();
+    alertDiv.innerHTML = dateInput.value + ' é uma data inválida! Deve ser no formato: dd/mm/aaaa';
+    alertDiv.style = 'display:visible;';
+    return false;
+  }
+
+  if(!isValidPercent(percentInput.value)){
+    percentInput.focus();
+    alertDiv.innerHTML = percentInput.value + ' é um percentual inválido! Deve ser um número entre 0 e 100.';
+    alertDiv.style = 'display:visible;';
+    return false;
+  }
+
+  return true;
+}
+</script>
+<form id="formFeature" method="post" action="/projeto/{{ project.id }}/funcionalidade" onsubmit="return validateFeatureForm()">
+<input type="hidden" id="feature_op" name="feature_op" value="add"/>
+<input type="hidden" id="feature_id" name="feature_id" value="0"/>
+<input type="hidden" id="feature_category_id" name="feature_category_id" value="0"/>
+<div class="modal fade" id="modalFeature" tabindex="-1" role="dialog" aria-labelledby="modalFeatureTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalFeatureTitle"> Funcionalidade </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <div id="alert-feature-validation" class="alert alert-danger fade show" role="alert" style="display:none">
+              Data Inválida
+            </div>
+            {% if messages %}
+              {% for message in messages %}
+                {% if 'funcionalidade' in message|lower %}
+                <script>document.getElementById('buttonFeature').click();</script>
+                <div id="alert-feature" class="alert alert-danger fade show" role="alert">
+                  {{ message }}
+                </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textProjectShortName" class="col-sm-4 col-form-label">Identificador:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textFeatureShortName" class="form-control" id="textFeatureShortName" value="" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textProjectName" class="col-sm-4 col-form-label">Nome:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textFeatureName" class="form-control" id="textFeatureName" value="" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textProjectName" class="col-sm-4 col-form-label">Data de Conclusão:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textFeatureEndDate" class="form-control" id="textFeatureEndDate" value="">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textProjectName" class="col-sm-4 col-form-label">Percentual Concluído:</label>
+          <div class="col-sm-8">
+            <input type="text" name="textFeaturePercent" class="form-control" id="textFeaturePercent" value="0" required>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="selectFeatureStatus" class="col-sm-4 col-form-label">Status:</label>
+          <div class="col-sm-8">
+            <select class="custom-select" id="selectFeatureStatus" name="selectFeatureStatus">
+              {% for status in feature_status.list() %}
+              <option value="{{ status }}">{{ status }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">&nbsp;&nbsp;Salvar&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Feature Removal Modal -->
+<div class="modal fade" id="modalRemoveFeature" tabindex="-1" role="dialog" aria-labelledby="modalRemoveFeatureTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRemoveFeatureTitle">Remover Funcionalidade</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Deseja realmente remover esta funcionalidade?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="document.getElementById('formFeature').submit();" style="width:100px;">Sim</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width:100px;">Não</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+{% endwith %}
 
 </body>
 </html>

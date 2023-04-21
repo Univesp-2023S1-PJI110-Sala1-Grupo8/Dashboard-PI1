@@ -1,11 +1,15 @@
 import time
+from datetime import datetime
 from flask import Flask, render_template, redirect, request, session, flash
 from flask_session import Session
 from model.user_model import User
 from model.profile_model import Profile
 from model.project_model import Project
+from model.feature_model import Feature
+from model.category_model import Category
 from model.value_objects import UserProfile
 from model.value_objects import ProjectStatus
+from model.value_objects import FeatureStatus
 from repository._database import Database
 from services.user_service import UserService
 from services.project_service import ProjectService
@@ -319,7 +323,127 @@ def change_project(project_id):
         flash("Projeto não localizado (ID: {}).".format(project_id))
         return redirect("/home")
 
-    return render_template("project.html", project=project, project_status=ProjectStatus)
+    project = project_service.load_project_by_id(project.id)
+
+    return render_template("project.html", project=project, project_status=ProjectStatus, feature_status=FeatureStatus)
+
+
+@app.route("/projeto/<project_id>/categoria", methods=["POST"])
+def process_category_in_project(project_id):
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+
+    project = project_service.find_project_by_id(project_id)
+    if project is None:
+        flash("Projeto não localizado (ID: {}).".format(project_id))
+        return redirect("/home")
+
+    category_op = request.form['category_op']
+    category_id = request.form['category_id']
+    category_name = request.form['textCategoryName']
+
+    category = Category(id=category_id, name=category_name)
+
+    if category_op == 'add':
+        try:
+            category = project_service.add_new_category_to_project(category, project)
+            if category is None or category.id == 0:
+                flash("Falha ao incluir a Categoria '{}'. Contacte o Administrador.".format(category_name))
+                return redirect('/home')
+        except Exception as err:
+            err_string = str(err)
+            if "exist" in err_string:
+                flash("Categoria '{}' já existente.".format(category_name))
+
+    elif category_op == 'edit':
+        try:
+            category = project_service.change_category_data(category)
+            if category is None or category.id == 0:
+                flash("Falha ao alterar a Categoria '{}'. Contacte o Administrador.".format(category_name))
+                return redirect('/home')
+        except Exception as err:
+            err_string = str(err)
+            if "exist" in err_string:
+                flash("Categoria '{}' já existente.".format(category_name))
+
+    elif category_op == 'del':
+        try:
+            category_was_removed = project_service.remove_category_from_project(category, project)
+            if not category_was_removed:
+                flash("Não foi possível remover a Categoria '{}'. Contacte o Administrador.".format(category_name))
+                return redirect('/home')
+        except Exception as err:
+            flash("Falha ao remover a Categoria '{}'. Contacte o Administrador.".format(category_name))
+            return redirect('/home')
+
+    return redirect('/projeto/{}'.format(project_id))
+
+
+@app.route("/projeto/<project_id>/funcionalidade", methods=["POST"])
+def process_feature_in_project(project_id):
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+
+    project = project_service.find_project_by_id(project_id)
+    if project is None:
+        flash("Projeto não localizado (ID: {}).".format(project_id))
+        return redirect("/home")
+
+    feature_op = request.form['feature_op']
+    feature_id = request.form['feature_id']
+    feature_name = request.form['textFeatureName']
+    feature_status = request.form['selectFeatureStatus']
+    feature_percent = request.form['textFeaturePercent']
+    feature_date_str = request.form['textFeatureEndDate']
+    feature_short_name = request.form['textFeatureShortName']
+
+    category_id = request.form['feature_category_id']
+    category = project_service.find_category_by_id(category_id)
+    if category is None:
+        flash("Categoria não localizada. Contacte o Administrador.")
+        return redirect('/home')
+
+    feature_end_date = None if feature_date_str == '' else datetime.strptime(feature_date_str, '%d/%m/%Y')
+
+    feature = Feature(id=feature_id, short_name=feature_short_name, name=feature_name,
+                      percent_done=feature_percent, estimated_end_date=feature_end_date,
+                      status=feature_status)
+
+    if feature_op == 'add':
+        try:
+            feature = project_service.add_new_feature_category(feature, category, project)
+            if feature is None or feature.id == 0:
+                flash("Falha ao incluir a Funcionalidade '{}'. Contacte o Administrador.".format(feature_short_name))
+                return redirect('/home')
+        except Exception as err:
+            err_string = str(err)
+            if "exist" in err_string:
+                flash("Funcionalidade '{}' já existente.".format(feature_short_name))
+
+    elif feature_op == 'edit':
+        try:
+            feature = project_service.change_feature_data(feature)
+            if category is None or category.id == 0:
+                flash("Falha ao alterar a Funcionalidade '{}'. Contacte o Administrador.".format(feature_short_name))
+                return redirect('/home')
+        except Exception as err:
+            err_string = str(err)
+            if "exist" in err_string:
+                flash("Funcionalidade '{}' já existente.".format(feature_short_name))
+
+    elif feature_op == 'del':
+        try:
+            feature_was_removed = project_service.remove_feature_from_category(feature, category, project)
+            if not feature_was_removed:
+                flash("Não foi possível remover a Funcionalidade '{}'. Contacte o Administrador.".format(feature_short_name))
+                return redirect('/home')
+        except Exception as err:
+            flash("Falha ao remover a Funcionalidade '{}'. Contacte o Administrador.".format(feature_short_name))
+            return redirect('/home')
+
+    return redirect('/projeto/{}'.format(project_id))
 
 
 if __name__ == "__main__":
