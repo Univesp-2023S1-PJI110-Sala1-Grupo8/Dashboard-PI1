@@ -23,8 +23,14 @@ class ProjectService:
     def remove_project(self, project):
         return self.project_repository.delete_project(project.id)
 
-    def get_all_projects_of_user(self, user):
+    def get_all_owned_projects_of_user(self, user):
         return self.project_repository.get_all_projects_of_user(user.id)
+
+    def get_all_granted_projects_of_user(self, user):
+        project_list = []
+        project_list.extend(self.permission_repository.get_allowed_projects_for_user(user.id))
+        project_list.extend(self.get_all_owned_projects_of_user(user))
+        return project_list
 
     def load_project_by_id(self, project_id):
         project = self.project_repository.find_project_by_id(project_id)

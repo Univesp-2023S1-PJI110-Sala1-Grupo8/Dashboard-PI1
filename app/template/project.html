@@ -20,10 +20,10 @@
       <li class="nav-link dropdown active">
         <a class="nav-link nav-item dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">Dashboards</a>
         <div class="dropdown-menu">
-        {% if projects|length <= 0 %}
+        {% if granted_projects|length <= 0 %}
           <a class="dropdown-item" href="#">Nenhum projeto disponível</a>
         {% else %}
-          {% for project in projects %}
+          {% for project in granted_projects %}
           <a class="dropdown-item" href="/dashboard/{{ project.id }}">{{ project.short_name }}</a>
           {% endfor %}
         {% endif %}
@@ -124,18 +124,6 @@
         </th>
       </tr>
     </thead>
-    <!--
-    <thead class="thead-light">
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Funcionalidade</th>
-        <th scope="col">Status</th>
-        <th scope="col">Percentual</th>
-        <th scope="col">Estimativa</th>
-        <th scope="col">Operações</th>
-      </tr>
-    </thead>
-    -->
   </table>
   {% for category in project.feature_categories %}
   <table class="table table-sm">
@@ -221,6 +209,58 @@
     {{ project.total_of_features }} funcionalidades cadastradas
     {% endif %}
   </p>
+
+  <hr>
+  <table class="table table-borderless table-sm">
+    <thead>
+      <tr>
+        <th scope="col" colspan="5">
+          <h4>Usuários Convidados</h4>
+        </th>
+        <th scope="col" colspan="1" class="text-right align-middle">
+            <button type="button" id="buttonNewGuest" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#modalNewGuest"
+                    onclick="document.getElementById('formNewGuest').reset();
+                             document.getElementById('user_project_id').value = '{{ project.id }}';
+                             setTimeout(function(){document.getElementById('textGuestEmail').focus();}, 750);">
+              Novo Convidado
+            </button>
+        </th>
+      </tr>
+    </thead>
+  </table>
+  {% if project.allowed_users|length > 0 %}
+  <table class="table table-sm">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">Nome do Usuário</th>
+        <th scope="col">E-mail</th>
+        <th scope="col">Operações&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in project.allowed_users %}
+      <tr>
+        <td scope="row">{{ user.first_name}} {{user.last_name}}</td>
+        <td>{{ user.email }}</td>
+        <td width="80px" class="text-right">
+          <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#modalRevokeUser"
+                  onclick="document.getElementById('user_id_to_revoke').value = '{{ user.id }}';">Revogar</button>&nbsp;
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  <p>
+    {% if project.allowed_users|length == 0 %}
+    Nenhum usuário convidado
+    {% elif project.allowed_users|length == 1 %}
+    1 usuário convidado
+    {% else %}
+    {{ project.allowed_users|length }} usuaŕios convidados
+    {% endif %}
+  </p>
+
 </div>
 </center>
 
@@ -530,6 +570,73 @@ function validateFeatureForm()
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" onclick="document.getElementById('formFeature').submit();" style="width:100px;">Sim</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width:100px;">Não</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+<!-- Add Guest Modal -->
+<form id="formNewGuest" method="post" action="/projeto/{{project.id}}/adicionar-usuario">
+<input type="hidden" id="user_project_id" name="user_project_id" value="0"/>
+<div class="modal fade" id="modalNewGuest" tabindex="-1" role="dialog" aria-labelledby="modalNewGuestTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalNewGuestTitle">Convidar Usuário</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <div class="col-sm-12">
+            {% if messages %}
+              {% for message in messages %}
+                {% if 'convidado' in message|lower %}
+                <script>document.getElementById('buttonNewGuest').click();</script>
+                <div id="alert-guest" class="alert alert-danger fade show" role="alert">
+                  {{ message }}
+                </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="textGuestEmail" class="col-sm-2 col-form-label">E-mail</label>
+          <div class="col-sm-10">
+            <input type="text" name="textGuestEmail" class="form-control" id="textGuestEmail" placeholder="Digite o e-mail do Convidado" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Convidar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+<!-- Confirm Revoke User Modal -->
+<form id="formRevokeGuest" method="post" action="/projeto/{{project.id}}/remover-usuario">
+<input type="hidden" id="user_id_to_revoke" name="user_id_to_revoke" value="0"/>
+<div class="modal fade" id="modalRevokeUser" role="dialog" aria-labelledby="modalRevokeUserTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRevokeUserTitle">Revogar Acesso de Usuário</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Deseja realmente revogar o acesso deste usuário a este projeto?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-danger" style="width:100px;">Sim</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width:100px;">Não</button>
       </div>
     </div>

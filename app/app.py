@@ -68,21 +68,21 @@ def logout():
     return redirect("/")
 
 
-def list_all_projects_of_user_in_current_session():
+def list_all_granted_projects_for_user_in_current_session():
     if not session.get("user_id"):
         return []
     user_id = session.get("user_id")
     user = user_service.find_user_by_id(user_id)
-    return project_service.get_all_projects_of_user(user)
+    return project_service.get_all_granted_projects_of_user(user)
 
 
 @app.route("/home")
 def home():
-
     if not session.get("user_id"):
         return redirect("/login")
-    projects = list_all_projects_of_user_in_current_session()
-    return render_template("home.html", projects=projects)
+
+    granted_projects = list_all_granted_projects_for_user_in_current_session()
+    return render_template("home.html", granted_projects=granted_projects)
 
 
 @app.route("/admin")
@@ -219,20 +219,21 @@ def list_projects():
     user = current_session_po_user()
     if user is None:
         return redirect("/")
-    projects = project_service.get_all_projects_of_user(user)
+    projects = project_service.get_all_owned_projects_of_user(user)
     if projects is None:
         flash("Falha ao carregar os projetos.")
         return redirect("/projetos")
+    granted_projects = list_all_granted_projects_for_user_in_current_session()
     project = Project()
-    return render_template("projects.html", projects=projects, project_status=ProjectStatus, project=project)
-
+    return render_template("projects.html", granted_projects=granted_projects, projects=projects,
+                           project_status=ProjectStatus, project=project)
 
 @app.route("/projeto/incluir", methods=["POST"])
 def new_project():
     user = current_session_po_user()
     if user is None:
         return redirect("/")
-    projects = project_service.get_all_projects_of_user(user)
+    projects = project_service.get_all_owned_projects_of_user(user)
     if projects is None:
         flash("Falha ao carregar os projetos. Contacte o Administrador.")
         return redirect("/")
@@ -255,7 +256,9 @@ def new_project():
         if "exist" in err_string:
             flash("Projeto já existente com este codinome informado.")
 
-    return render_template("projects.html", projects=projects, project_status=ProjectStatus, project=project)
+    granted_projects = list_all_granted_projects_for_user_in_current_session()
+
+    return render_template("projects.html", granted_projects=granted_projects, projects=projects, project_status=ProjectStatus, project=project)
 
 
 @app.route("/projeto/alterar", methods=["POST"])
@@ -263,7 +266,7 @@ def edit_project():
     user = current_session_po_user()
     if user is None:
         return redirect("/")
-    projects = project_service.get_all_projects_of_user(user)
+    projects = project_service.get_all_owned_projects_of_user(user)
     if projects is None:
         flash("Falha ao carregar os projetos. Contacte o Administrador.")
         return redirect("/")
@@ -287,7 +290,9 @@ def edit_project():
         if "exist" in err_string:
             flash("Projeto já existente com este codinome informado.")
 
-    return render_template("project.html", project=project, project_status=ProjectStatus)
+    granted_projects = list_all_granted_projects_for_user_in_current_session()
+
+    return render_template("project.html", granted_projects=granted_projects, project=project, project_status=ProjectStatus)
 
 
 @app.route("/projeto/remover", methods=["POST"])
@@ -324,8 +329,9 @@ def change_project(project_id):
         return redirect("/home")
 
     project = project_service.load_project_by_id(project.id)
+    granted_projects = list_all_granted_projects_for_user_in_current_session()
 
-    return render_template("project.html", project=project, project_status=ProjectStatus, feature_status=FeatureStatus)
+    return render_template("project.html", granted_projects=granted_projects, project=project, project_status=ProjectStatus, feature_status=FeatureStatus)
 
 
 @app.route("/projeto/<project_id>/categoria", methods=["POST"])
@@ -442,6 +448,56 @@ def process_feature_in_project(project_id):
         except Exception as err:
             flash("Falha ao remover a Funcionalidade '{}'. Contacte o Administrador.".format(feature_short_name))
             return redirect('/home')
+
+    return redirect('/projeto/{}'.format(project_id))
+
+
+@app.route("/projeto/<project_id>/adicionar-usuario", methods=["POST"])
+def add_user_to_project(project_id):
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+
+    project = project_service.find_project_by_id(project_id)
+    if project is None:
+        flash("Projeto não localizado (ID: {}).".format(project_id))
+        return redirect("/home")
+
+    user_email = request.form['textGuestEmail']
+    user = user_service.find_user_by_email(user_email)
+    if user is None:
+        flash("O e-mail do convidado não está existe ({}).".format(user_email))
+        return redirect('/projeto/{}'.format(project_id))
+
+    user_granted = project_service.grant_access_to_user(user, project)
+    if not user_granted:
+        flash("O convidado já está com acesso concedido.")
+        return redirect('/projeto/{}'.format(project_id))
+
+    return redirect('/projeto/{}'.format(project_id))
+
+
+@app.route("/projeto/<project_id>/remover-usuario", methods=["POST"])
+def remove_user_to_project(project_id):
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+
+    project = project_service.find_project_by_id(project_id)
+    if project is None:
+        flash("Projeto não localizado (ID: {}).".format(project_id))
+        return redirect("/home")
+
+    user_id = request.form['user_id_to_revoke']
+    user = user_service.find_user_by_id(user_id)
+    if user is None:
+        flash("O usuário convidado não foi localizado ({}).".format(user_id))
+        return redirect('/projeto/{}'.format(project_id))
+
+    user_revoked = project_service.revoke_access_from_user(user, project)
+    if not user_revoked:
+        flash("Falha ao remover o usuário selecionado ao projeto.")
+        return redirect("/home")
 
     return redirect('/projeto/{}'.format(project_id))
 

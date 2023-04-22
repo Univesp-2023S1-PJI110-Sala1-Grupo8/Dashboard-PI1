@@ -1,13 +1,15 @@
 import mysql.connector
 from repository.base_repository import BaseRepository
 from repository.user_repository import UserRepository
+from repository.project_repository import ProjectRepository
 
 class PermissionRepository(BaseRepository):
     """
     Permission repository class responsible for maintain persisted user permission for project access
     """
-    PERMISSION_REPO_SQL_DQL_GET_ALLOWED_USERS_FOR_PROJECT  = "SELECT usuario_id, projeto_id FROM usuario_permissao WHERE projeto_id = %s"
+    PERMISSION_REPO_SQL_DQL_GET_ALLOWED_USERS_FOR_PROJECT  = "SELECT up.usuario_id, up.projeto_id FROM usuario_permissao up INNER JOIN usuario u ON u.id = up.usuario_id WHERE up.projeto_id = %s ORDER BY u.nome, u.sobrenome ASC"
     PERMISSION_REPO_SQL_DQL_GET_PERMISSION_BY_USER_PROJECT = "SELECT usuario_id, projeto_id FROM usuario_permissao WHERE usuario_id = %s AND projeto_id = %s"
+    PERMISSION_REPO_SQL_DQL_GET_PERMISSION_BY_USER         = "SELECT usuario_id, projeto_id FROM usuario_permissao WHERE usuario_id = %s"
     PERMISSION_REPO_SQL_DML_INSERT_USER_PERMISSION         = "INSERT INTO usuario_permissao (usuario_id, projeto_id, permissao) VALUES (%s, %s, 1)"
     PERMISSION_REPO_SQL_DML_DELETE_USER_PERMISSION         = "DELETE FROM usuario_permissao WHERE usuario_id =%s AND projeto_id = %s"
 
@@ -71,6 +73,25 @@ class PermissionRepository(BaseRepository):
                 allowed_user = user_repository.find_user_by_id(user_id)
                 if allowed_user is not None:
                     resultList.append(allowed_user)
+            return resultList
+        except mysql.connector.Error as err:
+            self.report_error(err)
+        return None
+
+    def get_allowed_projects_for_user(self, user_id):
+        try:
+            cursor = self.db.conn.cursor()
+            cursor.execute(self.PERMISSION_REPO_SQL_DQL_GET_PERMISSION_BY_USER, (user_id,))
+            permission_list = []
+            for (permission) in cursor:
+                permission_list.append(permission)
+            cursor.close()
+            resultList = []
+            project_repository = ProjectRepository(self.db)
+            for (user_id, project_id) in permission_list:
+                granted_project = project_repository.find_project_by_id(project_id)
+                if granted_project is not None:
+                    resultList.append(granted_project)
             return resultList
         except mysql.connector.Error as err:
             self.report_error(err)
