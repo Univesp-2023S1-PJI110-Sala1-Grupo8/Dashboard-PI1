@@ -502,5 +502,22 @@ def remove_user_to_project(project_id):
     return redirect('/projeto/{}'.format(project_id))
 
 
+@app.route("/dashboard/<project_id>", methods=["GET"])
+def show_dashboard(project_id):
+    user = current_session_po_user()
+    if user is None:
+        return redirect("/")
+
+    project = project_service.find_project_by_id(project_id)
+    if project is None:
+        flash("Projeto não localizado (ID: {}).".format(project_id))
+        return redirect("/home")
+
+    project = project_service.load_project_by_id(project.id)
+    granted_projects = list_all_granted_projects_for_user_in_current_session()
+
+    return render_template("dashboard.html", granted_projects=granted_projects, project=project, project_status=ProjectStatus, feature_status=FeatureStatus)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
