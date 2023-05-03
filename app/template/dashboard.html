@@ -8,6 +8,22 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+  <style>
+    .dash-div {
+      font-size: 1rem;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      margin-left: -30px;
+
+      @include transform(rotate(270deg));
+      @include transform-origin(0 0);
+    }
+  </style>
 </head>
 <body style="background-color:#cacacf">
 
@@ -54,9 +70,55 @@
 <div style="background-color:black; height:1px; width:100%;"></div>
 <div style="background-color:white; height:1px; width:100%;"></div>
 
-<div style="margin:25px;">
-<h2>TODO: Renderizar Dashboard de Projeto</h2>
-</div>
+<div style="margin:10px;">
+
+  <table>
+    <tr>
+      <td style="border:2px solid white;margin-left:-100px;white-space:nowrap;max-width:25px;transform:rotate(270deg) translate(-100%,0px);">
+        {{ project.short_name }}
+      </td>
+      <td>&nbsp;</td>
+      <td style="background-color:white;vertical-align:top;border:2px solid black;padding:5px;">
+        <h4>{{ project.name }}</h4>
+            {{ project.description }}
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align:top;">
+        <div style="float:right;margin:0px 0px 0px 0px;width:150px;">
+          <table style="font-size:8pt;">
+            <tr>
+              <td style="width:20px;border:1px solid black;background:{{ feature_status.color(feature_status.NOT_STARTED)[0] }}"></td>
+              <td>NÃO INICIADA</td>
+            </tr>
+            <tr>
+              <td style="width:20px;border:1px solid black;border-top:0px;background:{{ feature_status.color(feature_status.UNDER_CONSTRUCTION)[0] }}"></td>
+              <td>EM CONSTRUÇÃO</td>
+            </tr>
+            <tr>
+              <td style="width:20px;border:1px solid black;border-top:0px;background:{{ feature_status.color(feature_status.CONSTRUCTED)[0] }}"></td>
+              <td>CONCLUÍDA</td>
+            </tr>
+            <tr>
+              <td style="width:20px;border:1px solid black;border-top:0px;background:{{ feature_status.color(feature_status.LATE)[0] }}"></td>
+              <td>ATRASADA</td>
+            </tr>
+            <tr>
+              <td style="width:20px;border:1px solid black;border-top:0px;background:{{ feature_status.color(feature_status.TESTED)[0] }}"></td>
+              <td>TESTADA</td>
+            </tr>
+            <tr>
+              <td style="width:20px;border:1px solid black;border-top:0px;background:{{ feature_status.color(feature_status.APPROVED)[0] }}"></td>
+              <td>APROVADA</td>
+            </tr>
+            <tr>
+              <td style="width:20px;border:1px solid black;border-top:0px;background:{{ feature_status.color(feature_status.CANCELED)[0] }}"></td>
+              <td>CANCELADA</td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
 
 </body>
 </html>
