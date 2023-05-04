@@ -3,7 +3,7 @@ from model.profile_model import Profile
 class FeatureStatus:
     """A class to indicate the feature status."""
     NOT_STARTED = "Não Iniciada"
-    UNDER_CONSTRUCTION = "Em Construção"
+    UNDER_CONSTRUCTION = "Construção"
     CONSTRUCTED = "Construída"
     TESTED = "Testada"
     APPROVED = "Aprovada"
