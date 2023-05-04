@@ -9,19 +9,38 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
   <style>
+    .dash-container {
+      display: flex;
+      flex-flow: row wrap;
+    }
+    .dash-card {
+      display: inline-block;
+      float:left;
+      border: 2px solid black;
+      height:200px;
+      min-width:110px;
+      max-width:110px;
+      margin-bottom:10px;
+    }
+    .dash-card1 {
+      margin-left:-165px;
+      margin-right:10px;
+    }
+    .dash-cardn {
+      margin-right:10px;
+    }
+    .dash-content {
+      text-align:center;
+    }
     .dash-div {
-      font-size: 1rem;
-      color: white;
+      background-color: #aaaaab;
       text-transform: uppercase;
-      letter-spacing: 3px;
-
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      margin-left: -30px;
-
-      @include transform(rotate(270deg));
-      @include transform-origin(0 0);
+      position: relative;
+      transform:rotate(270deg) translate(-85px,-86px);
+      min-height:28px; min-width:200px;
+      max-height:28px; max-width:200px;
+      border: 2px solid #ffffff;
+      text-align:center;
     }
   </style>
 </head>
@@ -85,7 +104,7 @@
       <td>&nbsp;</td>
       <td style="vertical-align:top;">
         <div style="float:right;margin:0px 0px 0px 0px;width:150px;">
-          <table style="font-size:8pt;">
+          <table style="font-size:10pt;">
             <tr>
               <td style="width:20px;border:1px solid black;background:{{ feature_status.color(feature_status.NOT_STARTED)[0] }}"></td>
               <td>NÃO INICIADA</td>
@@ -119,6 +138,41 @@
       </td>
     </tr>
   </table>
+  <br>
+
+  <div class="dash-container">
+  {% for category in project.feature_categories %}
+    <div class="dash-div">
+      {{ category.name }}
+    </div>
+    {% set counter = namespace(value = 0) %}
+    {% for feature in category.features %}
+    {% if counter.value == 0 %}
+    <div class="dash-card dash-card1">
+    {% else %}
+    <div class="dash-card dash-cardn">
+    {% endif %}
+    {% set counter.value = counter.value + 1 %}
+      <div class="dash-content" style="background-color:{{feature_status.color(feature.status)[0]}};
+                                       color:{{feature_status.color(feature.status)[1]}};">
+        <div style="height:12px;"></div>
+        <strong>{{ feature.short_name }}</strong><br>
+        <div style="font-size:12px;text-transform:uppercase;height:50px;font-weight:bold;">{{ feature.name }}</div>
+        <div style="font-size:12px;text-transform:uppercase;font-weight:bold;">{{ feature.status }}<br></div>
+        {{ feature.percent_done|round|int }}%<br>
+        <div style="width:100%;height:30px;margin-top:5px;margin-bottom:5px;
+                    border-top:2px solid black;border-bottom:2px solid black;
+                    background-color:white;">
+          <div style="width:{{ feature.percent_done|round|int }}%;height:26px;
+                      background-color:#00bb00;">&nbsp</div>
+        </div>
+        <strong>{{ '&nbsp;'|safe if feature.estimated_end_date == '' else feature.estimated_end_date.strftime('%d/%m/%Y') }}</strong>
+        <div style="height:3px;"></div>
+      </div>
+    </div>
+    {% endfor %}
+  {% endfor %}
+  </div>
 
 </body>
 </html>
