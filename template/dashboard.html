@@ -91,18 +91,21 @@
 
 <div style="margin:10px;">
 
-  <table>
+  <table width="100%">
     <tr>
-      <td style="border:2px solid white;margin-left:-100px;white-space:nowrap;max-width:25px;transform:rotate(270deg) translate(-100%,0px);">
+      <td width="25px" style="border:2px solid white;margin-left:-100px;white-space:nowrap;max-width:25px;
+                 transform:rotate(270deg) translate(-200%,0px);text-align:right;">
         {{ project.short_name }}
       </td>
-      <td>&nbsp;</td>
-      <td style="background-color:white;vertical-align:top;border:2px solid black;padding:5px;">
+      <td width="10px">&nbsp;</td>
+      <td width="*" style="background-color:white;vertical-align:top;border:2px solid black;padding:5px;">
         <h4>{{ project.name }}</h4>
-            {{ project.description }}
+            {% autoescape false %}
+            {{ project.description|replace('\r\n', '<br>') }}
+            {% endautoescape %}
       </td>
-      <td>&nbsp;</td>
-      <td style="vertical-align:top;">
+      <td width="10px">&nbsp;</td>
+      <td width="150px" style="vertical-align:top;">
         <div style="float:right;margin:0px 0px 0px 0px;width:150px;">
           <table style="font-size:10pt;">
             <tr>
