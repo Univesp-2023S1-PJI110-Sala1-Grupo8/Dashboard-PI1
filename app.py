@@ -1,7 +1,6 @@
 import time
 from datetime import datetime
 from flask import Flask, render_template, redirect, request, session, flash
-from flask_session import Session
 from model.user_model import User
 from model.profile_model import Profile
 from model.project_model import Project
