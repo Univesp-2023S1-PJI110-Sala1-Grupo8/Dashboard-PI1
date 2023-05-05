@@ -116,8 +116,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `dashboard_db`.`funcionalidade` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(45) NULL UNIQUE,
-  `nome_curto` VARCHAR(45) NULL UNIQUE,
+  `nome` VARCHAR(45) NULL,
+  `nome_curto` VARCHAR(45) NULL,
   `descricao` VARCHAR(45) NULL,
   `estimativa_conclusao` DATE NULL,
   `percentual_conclusao` DECIMAL(8,2) NULL,
