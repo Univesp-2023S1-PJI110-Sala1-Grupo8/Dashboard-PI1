@@ -13,8 +13,10 @@ from repository._database import Database
 from services.user_service import UserService
 from services.project_service import ProjectService
 
+
 def trace(msg):
     print("DASHBOARD|{}| {}".format(time.strftime("%Y-%m-%d %H:%M"), msg))
+
 
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
@@ -29,6 +31,7 @@ trace("Database is connected!")
 
 user_service = UserService(database)
 project_service = ProjectService(database)
+
 
 @app.route("/")
 def index():
@@ -117,7 +120,7 @@ def new_user():
     new_user_email = request.form['textNewUserEmail']
     new_user_pass = request.form['textNewUserPassword']
     trace("Adding new User (FirstName: {}, LastName: {}, E-mail: {}".format(
-           new_user_first_name, new_user_last_name, new_user_email))
+        new_user_first_name, new_user_last_name, new_user_email))
 
     guest_profile = UserProfile.GUEST
     new_user = User(id=0, first_name=new_user_first_name, last_name=new_user_last_name,
@@ -132,6 +135,7 @@ def new_user():
     flash(".Novo Usuário cadastrado. Verifique seu e-mail.")
 
     return redirect("/")
+
 
 @app.route("/usuario/zerar-senha", methods=["POST"])
 def forgot_password():
@@ -213,6 +217,7 @@ def current_session_po_user():
         return None
     return user
 
+
 @app.route("/projetos", methods=["GET"])
 def list_projects():
     user = current_session_po_user()
@@ -226,6 +231,7 @@ def list_projects():
     project = Project()
     return render_template("projects.html", granted_projects=granted_projects, projects=projects,
                            project_status=ProjectStatus, project=project)
+
 
 @app.route("/projeto/incluir", methods=["POST"])
 def new_project():
@@ -257,7 +263,8 @@ def new_project():
 
     granted_projects = list_all_granted_projects_for_user_in_current_session()
 
-    return render_template("projects.html", granted_projects=granted_projects, projects=projects, project_status=ProjectStatus, project=project)
+    return render_template("projects.html", granted_projects=granted_projects, projects=projects,
+                           project_status=ProjectStatus, project=project)
 
 
 @app.route("/projeto/alterar", methods=["POST"])
@@ -291,7 +298,8 @@ def edit_project():
 
     granted_projects = list_all_granted_projects_for_user_in_current_session()
 
-    return render_template("project.html", granted_projects=granted_projects, project=project, project_status=ProjectStatus)
+    return render_template("project.html", granted_projects=granted_projects, project=project,
+                           project_status=ProjectStatus)
 
 
 @app.route("/projeto/remover", methods=["POST"])
@@ -330,7 +338,8 @@ def change_project(project_id):
     project = project_service.load_project_by_id(project.id)
     granted_projects = list_all_granted_projects_for_user_in_current_session()
 
-    return render_template("project.html", granted_projects=granted_projects, project=project, project_status=ProjectStatus, feature_status=FeatureStatus)
+    return render_template("project.html", granted_projects=granted_projects, project=project,
+                           project_status=ProjectStatus, feature_status=FeatureStatus)
 
 
 @app.route("/projeto/<project_id>/categoria", methods=["POST"])
@@ -442,7 +451,8 @@ def process_feature_in_project(project_id):
         try:
             feature_was_removed = project_service.remove_feature_from_category(feature, category, project)
             if not feature_was_removed:
-                flash("Não foi possível remover a Funcionalidade '{}'. Contacte o Administrador.".format(feature_short_name))
+                flash("Não foi possível remover a Funcionalidade '{}'. Contacte o Administrador.".format(
+                    feature_short_name))
                 return redirect('/home')
         except Exception as err:
             flash("Falha ao remover a Funcionalidade '{}'. Contacte o Administrador.".format(feature_short_name))
@@ -515,7 +525,8 @@ def show_dashboard(project_id):
     project = project_service.load_project_by_id(project.id)
     granted_projects = list_all_granted_projects_for_user_in_current_session()
 
-    return render_template("dashboard.html", granted_projects=granted_projects, project=project, project_status=ProjectStatus, feature_status=FeatureStatus)
+    return render_template("dashboard.html", granted_projects=granted_projects, project=project,
+                           project_status=ProjectStatus, feature_status=FeatureStatus)
 
 
 if __name__ == "__main__":
